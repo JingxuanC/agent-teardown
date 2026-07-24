@@ -16,6 +16,7 @@ Kimi Code CLI 是 Moonshot AI 开源的终端 AI agent(`MoonshotAI/kimi-code`,Ty
 | 04 | [Subagent 系统](04-subagent.md) | ✅ | 扁平 lifecycle registry + 纯函数运行层 + 镜像事件层 |
 | 05 | [Plan Mode 与权限沙箱](05-plan-mode.md) | ✅ | 规划/执行隔离 + 四种动态 reminder + 文件级 plan 产物 |
 | 06 | [工具系统与权限责任链](06-tool-system.md) | ✅ | resolveExecution 两阶段 + 19 policy 责任链 + 资源冲突检测 |
+| 07 | [Wire 协议与 Op/Model](07-wire-protocol.md) | ✅ | 事件溯源架构 + 持久化 + restore + migration 链 |
 | 03 | Goal Mode | ⏳ | 自治多轮驱动的状态机 |
 | 04 | Subagent 系统 | ⏳ | spawn / resume / retry / scope 隔离 |
 | 05 | Plan Mode | ⏳ | EnterPlanMode → ExitPlanMode 的权限沙箱 |
