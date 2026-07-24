@@ -1,319 +1,325 @@
-# Insights · Agent 本质 —— 行业全景与设计哲学
+# Insights · Agent 的第二定律 —— 反熵增
 
-> 本篇综合 Anthropic / OpenAI / Google / Kimi / 智谱 / DeepSeek 等大厂在 agent 领域的公开探索,提炼出他们对"agent 是什么"的本质理解。基于公开文档、技术博客、SDK 设计,不是猜测。
-
-## 1. 大厂对 Agent 的定义(高度一致)
-
-### Anthropic(最清晰)
-
-> **Workflows** are systems where LLMs and tools are orchestrated through **predefined code paths**.
+> 本篇是拆解 kimi-code(25 篇)+ grok-build(10 篇)后,对"agent 到底是什么"的**最终思考**。不是行业调研(那个在 §9),是我自己的洞察。
 >
-> **Agents**, on the other hand, are systems where LLMs **dynamically direct their own processes** and tool usage, maintaining control over how they accomplish tasks.
+> 核心论点:**Agent 的本质是反熵增。所有工程努力都是在对抗系统的自然退化。**
 
-—— [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
+## 0. 起点:一个尴尬的事实
 
-**关键区分**:路径是预定义的(workflow)还是 LLM 自己决定的(agent)。
+拆完 35 篇文档后,我发现一个尴尬的事实:
+
+**LLM + 工具 + 记忆 + 循环 = 人人都知道的东西**。GPT 一下就能出来。这不是"洞察",是"描述"。
+
+真正的问题是:**为什么 agent 这么难做好?**
+
+如果你有一块 200K context 的 LLM,给它 10 个工具,让它循环跑 —— 它**立刻就会出问题**:
+- 20 轮后 context 爆了
+- 30 轮后开始重复(陷入 doom loop)
+- 50 轮后"忘记"了用户最初的请求
+- 100 轮后可能还没完成,但 token 已经烧了几十块
+
+**这不是 LLM 不够聪明的问题。这是热力学问题。**
+
+## 1. Agent 的第二定律
+
+> 在一个孤立系统中,熵(混乱度)总是增加的。Agent 也不例外。
+
+Agent 的运行**天然会产生熵**。这不是 bug,是物理定律:
+
+```
+用户输入 → LLM 推理 → 工具执行 → 结果反馈 → LLM 再推理 → ...
+              ↑                                          ↑
+         每一步都在产生熵                            熵不断累积
+```
+
+| 熵的种类 | 产生原因 | 不干预的后果 |
+|---|---|---|
+| **上下文熵** | 对话越来越长,信息堆积 | LLM 注意力分散,回复质量下降 |
+| **状态熵** | goal / plan / mode 状态变化累积 | 状态机不可逆,bug 堆积 |
+| **工具熵** | 工具结果堆积,有用和无用混杂 | context 爆炸,token 浪费 |
+| **行为熵** | agent 偏离正轨(重复、绕圈、放弃) | doom loop,用户体验崩溃 |
+| **错误熵** | 错误累积,retry 失败叠加 | 系统崩溃或 hang |
+
+**Agent 框架的全部工作 = 对抗这五种熵。**
+
+## 2. 所有模块 = 反熵措施
+
+回头看拆过的 **35 篇文档**,**每一个模块**都能对应到一种"反熵":
+
+### 反上下文熵(对抗信息堆积)
+
+| 措施 | 框架 | 怎么做 |
+|---|---|---|
+| **Compaction** | kimi-code | LLM 写 handoff note 替换旧消息 |
+| **两遍压缩** | grok-build | pass1 压 95% → pass2 合并尾部,保留更多细节 |
+| **StepSummary 折叠** | kimi-code | 老 step 藏成"… thinking 5 times" |
+| **Subagent 隔离** | 两者 | 子 agent 的 context 不污染父 |
+| **reminder 变体** | kimi-code | full/sparse/reentry,省 token |
+
+### 反行为熵(对抗偏离正轨)
+
+| 措施 | 框架 | 怎么做 |
+|---|---|---|
+| **Doom Loop 检测** | grok-build | 服务端实时检测重复 + mid-stream abort |
+| **Stop Detector** | grok-build | regex 检测"I'll stop here"等过早放弃信号 |
+| **Goal Strategist** | grok-build | stall 时 spawn 独立 agent 重组策略 |
+| **3 轮 blocked 审计** | kimi-code | 连续 3 次才能声明 blocked(防偷懒) |
+| **max_steps** | 两者 | 硬上限(1000),最后的防线 |
+| **Goal continuation prompt** | 两者 | 每轮注入目标,防止"忘了一开始要干嘛" |
+
+### 反状态熵(对抗状态混乱)
+
+| 措施 | 框架 | 怎么做 |
+|---|---|---|
+| **Wire Op/Model** | kimi-code | 状态变更走纯函数 apply,可重放 |
+| **DeepReadonly** | kimi-code | Object.freeze 防篡改 |
+| **SQLite + checkpoint** | grok-build | 快照 + 增量恢复 |
+| **Hunk Tracker** | grok-build | 行级别变更追踪,精确 undo |
+| **Worktree Pool** | grok-build | 预创建隔离环境,防交叉污染 |
+| **Scope 生命周期** | kimi-code | App/Session/Agent 三层,销毁即清理 |
+
+### 反错误熵(对抗错误累积)
+
+| 措施 | 框架 | 怎么做 |
+|---|---|---|
+| **Skeptic Panel** | grok-build | N 个独立 agent 对抗验证 goal 完成 |
+| **Circuit Breaker** | grok-build | 滑动窗口熔断,防 provider 故障雪崩 |
+| **Sandbox** | grok-build | 物理隔离(landlock/seatbelt),即使权限误判也兜底 |
+| **Permission 链** | 两者 | 多 policy 决策,单点失误不致命 |
+| **错误归一化** | kimi-code | kosong 把 5 种 provider 错误统一 |
+| **abort 理由传播** | 两者 | 区分用户取消 vs 超时 vs 错误 |
+
+### 反工具熵(对抗工具膨胀)
+
+| 措施 | 框架 | 怎么做 |
+|---|---|---|
+| **BM25 工具搜索** | grok-build | 100+ 工具时用搜索引擎而非全量列表 |
+| **tool dedup** | kimi-code | 同名工具去重 |
+| **MCP 工具上限** | 两者 | 最多 100 个,防撑爆 LLM tool list |
+| **profile 工具集** | 两者 | explore 不注册写工具(减少选择空间) |
+
+## 3. 反熵的"能量投入"
+
+热力学第二定律说:要减少熵,必须**从外部输入能量**。
+
+Agent 的"能量"是什么?
+
+```
+能量 = LLM 算力(token 成本)+ 工程约束(代码)
+```
+
+每次反熵操作都要**花钱**:
+
+| 反熵操作 | 成本 |
+|---|---|
+| Compaction(一次 LLM 调用) | ~$0.01-0.05 |
+| Skeptic panel(N 个 LLM 调用) | ~$0.05-0.20 |
+| 两遍压缩(两次 LLM 调用) | ~$0.02-0.10 |
+| Doom loop abort + retry | 额外一轮 LLM 调用 |
+| Goal continuation prompt | 每轮多 ~200 token |
+
+**这就是为什么 agent 比 chatbot 贵得多** —— 不是因为"功能多",是因为**反熵需要持续的能量投入**。每次 compaction、每次 skeptic 验证、每次 continuation prompt,都是"花钱买秩序"。
+
+**推论**:一个完全不做反熵的 agent 最便宜,但会在 20 轮后崩溃。一个"过度反熵"的 agent 很贵,但稳定。**好的 agent 框架在成本和秩序之间找平衡**。
+
+## 4. 五种反熵策略
+
+从 35 篇拆解中,我抽象出**五种反熵策略**:
+
+### ① 压缩(Compress)
+
+把大量信息**有损压缩**成少量精华。
+
+- kimi-code:单遍 compaction(LLM 写 handoff)
+- grok-build:两遍 compaction(pass1 + pass2)
+
+**类比**:空调压缩机(把气态制冷剂压缩成液态,释放热量)。
+
+### ② 隔离(Isolate)
+
+把**不相关的部分**隔开,防止交叉污染。
+
+- Subagent 隔离:子 agent 的 context 不进父 agent
+- Worktree 隔离:不同任务在不同 git worktree
+- Sandbox 隔离:子进程在沙箱里,碰不到主系统
+
+**类比**:防火门(把火灾控制在局部)。
+
+### ③ 验证(Verify)
+
+不信任系统自身的判断,用**独立的第三方**复核。
+
+- Skeptic panel:N 个独立 agent 投票
+- Stop detector:regex 检测 bail 信号
+- Permission policy:多个独立规则链式决策
+
+**类比**:审计制度(自己说的不算,要第三方审)。
+
+### ④ 恢复(Recover)
+
+当系统已经退化,**回到已知好的状态**。
+
+- Wire restore:重放 Op 序列重建状态
+- Checkpoint + rewind:回到快照点
+- Circuit breaker:熔断后等冷却再半开试探
+- Doom loop retry:abort 后重试
+
+**类比**:自动备份(崩溃后还原)。
+
+### ⑤ 约束(Constrain)
+
+在系统**开始退化前**就限制行为空间。
+
+- max_steps:防止无限循环
+- Goal 状态机:只允许特定状态转换
+- Budget(turn/token/wall-clock):限制资源消耗
+- Sandbox profile:限制文件/网络访问
+
+**类比**:限速器(车开不快就不会翻)。
+
+## 5. 反熵密度 = 框架质量
+
+回到核心论点:
+
+> **Agent 框架的好坏 = 反熵措施的密度和质量。**
+
+kimi-code vs grok-build:
+
+| 维度 | kimi-code | grok-build |
+|---|---|---|
+| **反熵措施数** | ~15 个 | ~25 个 |
+| **反熵策略** | 压缩 + 恢复 + 约束(少而精) | 五种全覆盖(多而全) |
+| **反熵质量** | **架构级**(DI/wire 是根本性的) | **功能级**(每个是独立补丁) |
+| **反熵成本** | 低(靠架构,不靠额外 LLM 调用) | 高(skeptic panel + 两遍压缩 = 多次 LLM) |
+
+**这不是谁好谁坏**,是两种反熵哲学:
+- **kimi-code**:从架构层面防熵(DI 让状态天然有序,wire 让变更天然可恢复)
+- **grok-build**:从功能层面反熵(每个退化模式都有专门的对抗措施)
+
+## 6. 为什么 agent 比传统软件难
+
+传统软件的熵增很慢:
+- 代码写好了,不变就不增熵
+- 内存满了?重启就好(状态全清)
+- 程序员**手动控制**所有状态转换
+
+Agent 的熵增**极快**:
+- 每个 turn 都产生新信息(上下文熵)
+- LLM 每次返回不同内容(不可预测)
+- agent 跑 100 轮,状态空间爆炸
+- **没有人类在中间干预**每个决定
+
+这就是为什么 agent 需要**远比传统软件多的工程基础设施**:不是因为它"功能多",是因为它的**熵增速率远高于传统软件**。
+
+## 7. 一个预测
+
+如果"反熵增"是 agent 的本质,那么:
+
+### 预测 1:未来的 agent 框架会有更多反熵功能
+
+- **主动反思**:agent 跑完后自动复盘,把经验存入长期记忆(grok-build 的 memory crate 是雏形)
+- **自适应压缩**:根据 context 内容**动态决定**保留什么(不只是按比例)
+- **预测性 doom loop 检测**:在循环发生**之前**就预判(基于行为模式)
+- **多模态 compaction**:不只压缩文本,还压缩图片/代码 diff
+
+### 预测 2:反熵成本会成为 agent 的主要成本
+
+随着 LLM 价格下降,反熵(skeptic / compaction / continuation)的 LLM 调用成本占比会**越来越高**。未来的优化方向是**减少反熵的 LLM 调用**:
+- 用小模型做 skeptic(不需要全能力)
+- 用算法替代部分 compaction(例如提取式摘要)
+- 用缓存减少重复验证
+
+### 预测 3:Agent 的"天花板"由反熵能力决定
+
+不是 LLM 的智商决定 agent 上限,是**反熵措施的效率**决定。一个 70 分的 LLM + 优秀的反熵 = 比 99 分的 LLM + 糟糕的反熵更好的 agent。
+
+## 8. 最终定义
+
+> **Agent 是一个在不可逆的熵增中,通过持续的能量投入(压缩、隔离、验证、恢复、约束),维持秩序和目标导向性的系统。**
+
+不是"LLM + 工具 + 记忆"(那只描述了结构)。
+不是"自主决策"(那只描述了行为)。
+
+**Agent 的本质是反熵增** —— 和生命体、建筑物、社会组织一样,存在的意义就是对抗自然的混乱趋势。
+
+之前定义的五个特征(自主性/反馈环/持久性/约束/可组合性)**都是反熵的手段**:
+
+| 特征 | 对应的反熵策略 |
+|---|---|
+| 自主性(Autonomy) | 约束(限制决策空间,防止发散) |
+| 反馈环(Feedback Loop) | 验证(通过结果修正方向) |
+| 持久性(Persistence) | 恢复(崩溃后重建秩序) |
+| 约束(Constraint) | 约束(直接限制行为) |
+| 可组合性(Composability) | 隔离(分而治之,防交叉污染) |
+
+五个特征不是并列的,是**从属于"反熵增"这一根本目标的具体手段**。
+
+---
+
+## 9. 行业全景(之前的调研,保留作参考)
+
+以下是大厂对 agent 的公开探索,作为本篇的**佐证** —— 你会发现他们的所有设计**都能归入五种反熵策略**:
+
+### Anthropic
+
+五种 workflow 模式:
+- Prompt chaining = **约束**(固定序列防发散)
+- Routing = **约束**(分类后定向处理)
+- Parallelization = **隔离**(独立子任务不干扰)
+- Orchestrator-workers = **隔离**(动态分解)
+- Evaluator-optimizer = **验证**(迭代改进)
 
 ### OpenAI
 
-> An **Agent** is an instance of an LLM guided by specific instructions and capable of utilizing various _tools_.
->
-> The **agent loop**: agent first attempts to respond; if it lacks information or requires external action, it calls the appropriate tool, processes the result, and tries again.
-
-—— [OpenAI Agents SDK](https://developers.openai.com/api/docs/guides/agents)
-
-**关键词**:loop、tools、instructions。
+Agents SDK 核心:
+- Guardrails = **约束**(输入/输出校验)
+- Handoff = **隔离**(agent 间干净交接)
+- Tracing = **恢复**(可回溯调试)
+- Sandbox = **隔离**(容器化执行)
 
 ### Google
 
-> Agent design patterns offer a distinct framework for organizing a system's components, integrating the model, and **orchestrating** a single agent or multiple agents to accomplish a workflow.
-
-—— [Choose a design pattern for your agentic AI system](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system)
-
-Google 把 agent 看作**设计模式的组合**(single / sequential / parallel / loop / review-critique / iterative-refinement / coordinator / hierarchical / swarm / ReAct / human-in-the-loop)。
-
-### Kimi(Moonshot)
-
-从 kimi-code 源码推断:Moonshot 的观点是 **"agentic systems = LLM + 持久化状态机 + 工程化约束"**。他们的 wire 协议、goal 状态机、权限责任链都是"工程化约束"的体现。
-
-### 智谱(GLM)
-
-> 2025 年是 AI Agent 的爆发之年。智谱将搭建 Agentic 大模型平台。
->
-> AutoGLM 沉思模型:全球首个集**深度研究与实际操作能力**于一体的 Agent。
-
-—— 张鹏,智谱 CEO
-
-智谱的方向是**研究 + 操作一体化**(DeepResearch + 操作执行)。
-
-### DeepSeek
-
-DeepSeek 的核心贡献是**混合推理架构**(Hybrid-Inference),把"快思考"和"慢思考"统一在一个模型里。对 agent 的意义:**推理能力本身是 agent 的基础**,DeepSeek 让推理更便宜,降低了 agent 的成本。
-
-## 2. 六家厂商的探索方向对比
-
-| 厂商 | 核心贡献 | 对 Agent 本质的理解 |
-|---|---|---|
-| **Anthropic** | MCP 协议 + Building Effective Agents(五种 workflow 模式) | 简单优先,workflow 和 agent 是光谱的两端 |
-| **OpenAI** | Agents SDK + Swarm(演进版)+ Codex | Python-first,最小抽象,handoff 是核心 |
-| **Google** | A2A 协议 + ADK + 设计模式分类法 | Agent 是设计模式的组合,标准化互操作 |
-| **Kimi(Moonshot)** | kimi-code(wire/Op/goal/swarm) | 工程化约束 > LLM 能力,持久化状态是关键 |
-| **智谱** | AutoGLM 沉思 + GLM-4.5 MoE | 研究 + 操作一体化,自我反思能力 |
-| **DeepSeek** | R1 推理模型 + V3.1 混合推理 | 推理是 agent 的基础,降本增效 |
-
-## 3. 行业共识:Agent 的五个本质特征
-
-综合六家观点,提炼出 **agent 的五个本质特征**(不是"LLM + 工具 + 记忆"这种描述,而是更深层的):
-
-### ① 自主性(Autonomy)—— 决策权的让渡
-
-**Anthropic 的定义核心**:
-
-> Agents are systems where LLMs **dynamically direct their own processes**.
-
-传统软件:程序员写 if-else,所有路径确定。
-Agent:**LLM 决定下一步做什么**,路径是运行时动态产生的。
-
-但**自主性不是非黑即白**,是一个**光谱**:
-
-```
-完全预定义 ←————————————————————→ 完全自主
-  prompt chaining    routing    orchestrator-workers    autonomous agent
-  (workflow)         (workflow)  (workflow)               (agent)
-```
-
-**Anthropic 的五种模式**就是这个光谱上的刻度:
-
-| 模式 | 自主性 | 谁决定路径 |
-|---|---|---|
-| Prompt chaining | 最低 | 代码(固定序列) |
-| Routing | 低 | 代码 + LLM 分类 |
-| Parallelization | 低 | 代码(并行结构) |
-| Orchestrator-workers | 中 | LLM(动态分解任务) |
-| Evaluator-optimizer | 中 | LLM(迭代改进) |
-| **Autonomous agent** | **最高** | **LLM(完全自主)** |
-
-**kimi-code 的对应**:
-- Plan mode = prompt chaining(workflow)
-- Swarm = parallelization(workflow)
-- Goal mode = autonomous agent(agent)
-- Subagent = orchestrator-workers(workflow)
-
-### ② 反馈环(Feedback Loop)—— 行动 → 观察 → 再行动
-
-**OpenAI 的定义核心**:
-
-> The agent loop: respond → if needs tool → call tool → process result → try again.
-
-这不是简单的"调用一次",是**循环**。循环的质量决定 agent 的好坏:
-
-- **及时性**:流式渲染让 LLM 不等
-- **准确性**:工具结果可靠
-- **丰富度**:多模态反馈
-- **不污染**:错误不传播
-
-**kimi-code 的整个架构都在优化这个循环**:
-- 流式渲染(13-tui)
-- 错误归一化(15-errors)
-- 子 agent 隔离(04-subagent)
-- wire 持久化(07-wire)
-
-### ③ 持久性(Persistence)—— 意图不会因技术原因丢失
-
-这是 **kimi-code 最强调但其他厂商较少讨论**的特征。
-
-**Chatbot**:用户发 → 软件回 → 结束。意图不持久。
-**Agent**:意图被**持久化**,即使进程崩溃、context 满了、用户走开。
-
-kimi-code 的体现:
-- Wire log restore(进程崩溃后恢复)
-- Compaction handoff(context 满了不丢关键信息)
-- Goal paused/blocked(用户走开了意图不消失)
-- Cron(用户不在线时 agent 主动工作)
-
-**Google 的 A2A 协议**也有类似概念:Task 有完整的生命周期(created/submitted/working/completed/failed),跨 agent 传递。
-
-### ④ 约束(Constraint)—— 给不可靠的 LLM 套上可靠的壳
-
-**这是 Anthropic 和 kimi-code 最一致的观点**。
-
-Anthropic:
-
-> Maintain **simplicity** in your agent's design.
-> Prioritize **transparency** by explicitly showing the agent's planning steps.
-> **When more complexity is warranted**, workflows offer predictability and consistency.
-
-kimi-code 的整个权限系统(19 个 policy)+ 状态机(goal 四状态)+ 边界检查(max_steps、minChars、3 轮 blocked)都是**约束**。
-
-**约束的本质**:LLM 越不可靠,约束越重。Agent 框架不是"让 LLM 更聪明",是**给不可靠的 LLM 套上可靠的壳**。
-
-**OpenAI 的 guardrails** 也是约束:
-
-> Guardrails can ensure that parameters passed to an agent conform to a specific format, terminating the agent loop early if they don't.
-
-### ⑤ 可组合性(Composability)—— 从单体到群体
-
-**所有大厂都在朝这个方向走**:
-
-- **Anthropic**:MCP 让工具可组合
-- **OpenAI**:handoff 让 agent 可组合
-- **Google**:A2A 让 agent 跨厂商可组合
-- **kimi-code**:swarm 让 agent 并行可组合
-
-**Google 的 A2A 是最大胆的愿景**:
-
-> A2A enables AI agents from different vendors to discover each other, delegate tasks, and coordinate work across enterprise systems.
-
-这是**互联网级的 agent 协作** —— 一个公司的招聘 agent 和另一个公司的日历 agent 自动协调面试时间。
-
-## 4. 三大协议:Agent 的 TCP/IP 时刻
-
-2025 年出现的三大协议,正在形成 agent 互操作的"TCP/IP 栈":
-
-```mermaid
-flowchart TB
-    subgraph Agent["Agent 层"]
-        A2A["A2A (Google)<br/>Agent ↔ Agent<br/>发现 / 委托 / 协调"]
-    end
-
-    subgraph Client["Client 层"]
-        ACP["ACP (Zed)<br/>IDE ↔ Agent<br/>JSON-RPC over stdio"]
-    end
-
-    subgraph Tool["Tool 层"]
-        MCP["MCP (Anthropic)<br/>Agent ↔ Tool<br/>工具协议标准化"]
-    end
-
-    A2A --> ACP --> MCP
-```
-
-| 协议 | 谁提出 | 解决什么 | 类比 |
-|---|---|---|---|
-| **MCP** | Anthropic | Agent 怎么调工具 | HTTP(应用层) |
-| **ACP** | Zed 社区 | IDE 怎么驱动 Agent | WebSocket(双向通信) |
-| **A2A** | Google | Agent 之间怎么协作 | TCP(传输层) |
-
-**kimi-code 全部实现了**:MCP(11-mcp.md)+ ACP(16-acp-ide.md),只是没实现 A2A(那需要跨厂商协调)。
-
-## 5. Agent 的设计模式分类法
-
-**Google 的分类法最系统**(10 种模式):
-
-| 模式 | 结构 | 何时用 |
-|---|---|---|
-| **Single agent** | 一个 agent + 工具 | 简单任务 |
-| **Sequential** | A → B → C 流水线 | 有明确阶段 |
-| **Parallel** | A ‖ B ‖ C → 汇总 | 独立子任务 |
-| **Loop** | A → 检查 → 再 A | 迭代改进 |
-| **Review-critique** | A 做 → B 审 → A 改 | 需要质量控制 |
-| **Iterative refinement** | A → 评分 → 改 → 评分 → ... | 追求最优 |
-| **Coordinator** | 调度器 → 专家 A/B/C | 需要路由 |
-| **Hierarchical** | 经理 → 组长 → 员工 | 复杂分解 |
-| **Swarm** | 对等协作(共享 context) | 创造性任务 |
-| **ReAct** | 推理 → 行动 → 观察 → 推理 | 通用 |
-
-**kimi-code 的 swarm ≠ Google 的 swarm**:
-- kimi-code swarm = Google 的 **Parallel**(独立子任务,不通信)
-- Google swarm = 对等协作,agent 之间共享 context、互相 critique
-
-## 6. 最前沿的探索方向
-
-### 6.1 自我反思(Self-Reflection)
-
-**智谱的 AutoGLM 沉思**和 **Anthropic 的 evaluator-optimizer 模式**都在朝这个方向走。
-
-**当前 kimi-code 缺失的**:agent 不会"事后想想自己做错了什么,下次改进"。所有"学习"都靠人改 prompt。
-
-**前沿方向**:
-- Agent 跑完后自动复盘
-- 把经验存入长期记忆
-- 下次遇到类似任务时调用历史经验
-
-### 6.2 跨 Agent 互操作(A2A)
-
-**Google 的 A2A 协议**正在推动"agent 互联网":
-
-> A2A enables AI agents from different vendors to discover each other, delegate tasks, and coordinate work.
-
-**Agent Card**:每个 agent 发布一个"能力卡片"(类似 web 的 DNS),其他 agent 可以发现并委托任务。
-
-**愿景**:一个公司的 agent 可以安全地调用另一个公司的 agent,不需要人工对接。
-
-### 6.3 具身智能(Embodied AI)
-
-> 从数字世界到物理世界:Agent 的"行动"将不再局限于调用 API 和操作软件,而是能够控制机器人、无人机等物理实体。
-
-这是 agent 从"软件"变成"实体"的方向。当前的 coding agent 都是纯数字的,但未来可能控制物理设备。
-
-### 6.4 边缘化与去中心化
-
-> 为了保护用户隐私和降低延迟,越来越多的轻量级 Agent 将被部署在边缘设备上(如手机、汽车、智能眼镜)。
-
-手机上的 agent 不需要云端,本地跑。这对模型大小和框架轻量化提出新要求。
-
-## 7. 重新定义 Agent 的本质
-
-综合以上所有信息,我给出一个**比"LLM + 工具 + 记忆"更深**的定义:
-
-> **Agent 是一个系统,它把不可靠的 LLM,通过工程约束和反馈环,变成能持续追求目标、能从环境中获取信息、能根据反馈调整行为的自主实体。**
-
-五个关键词:
-1. **不可靠 → 可信赖**:工程约束的核心
-2. **持续追求目标**:区别于 chatbot
-3. **从环境获取信息**:感知
-4. **根据反馈调整行为**:学习(即使是 prompt 级别的)
-5. **自主实体**:决策权的让渡
-
-**Agent 不是"更聪明的 LLM",是"给 LLM 加了一套让它可信赖的工程系统"**。
-
-## 8. 给 kimi-code 的定位
-
-基于行业全景,kimi-code 的定位:
-
-| 维度 | kimi-code 的选择 | 行业主流 |
-|---|---|---|
-| **自主性光谱** | 全覆盖(plan=workflow 到 goal=agent) | 各家都在光谱上选位置 |
-| **反馈环质量** | 极致优化(流式、错误归一、子 agent 隔离) | 共识 |
-| **持久性** | **最强调**(wire log、goal 状态机、cron) | 较少讨论 |
-| **约束** | **最重**(19 policy 权限链、四状态机) | Anthropic 接近 |
-| **可组合性** | swarm(并行) + MCP + ACP | 朝 A2A 发展 |
-| **自我反思** | ❌ 缺失 | 智谱/Anthropic 在探索 |
-| **跨 Agent 互操作** | ❌ 缺失(A2A 未实现) | Google 在推动 |
-
-**kimi-code 的独特优势**:**持久性 + 约束**做得最深。这反映了 Moonshot 的工程文化 —— 他们认为"LLM 不可靠,所以工程约束比 LLM 能力更重要"。
-
-**kimi-code 的缺失**:**自我反思 + 跨 Agent 互操作**。这是未来需要补的方向。
-
-## 9. 参考资料
-
-### 官方文档(必读)
-
-- **Anthropic** · [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) · 五种 workflow 模式 + agent 定义
-- **Anthropic** · [Building Effective AI Agents PDF](https://resources.anthropic.com/hubfs/Building%20Effective%20AI%20Agents-%20Architecture%20Patterns%20and%20Implementation%20Frameworks.pdf) · 完整架构模式 + 案例
-- **OpenAI** · [Agents SDK](https://developers.openai.com/api/docs/guides/agents) · SDK 设计哲学
-- **OpenAI** · [New tools for building agents](https://openai.com/index/new-tools-for-building-agents/) · 发布博客
-- **Google** · [Choose a design pattern](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system) · 10 种设计模式
-- **Google** · [A2A Protocol](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) · 跨 Agent 互操作
-- **Google** · [ADK + A2A Codelab](https://codelabs.developers.google.com/adk-a2a-agent-runtime)
-
-### 国内大厂
-
-- **智谱** · AutoGLM 沉思(自我反思 agent)
-- **DeepSeek** · R1 推理模型 + V3.1 混合推理
-- **Kimi(Moonshot)** · kimi-code(本仓库拆解的对象)
-
-### 学术
-
-- ReAct: Reasoning + Acting(Yao et al., 2022)
-- Reflexion: Language Agents with Verbal Reinforcement Learning(Shinn et al., 2023)
-- A Survey on Large Language Model based Autonomous Agents(Wang et al., 2024)
-
-### 本仓库相关拆解
-
-- [01-architecture.md](../frameworks/kimi-code/01-architecture.md) —— DI × Scope 是约束的地基
-- [02-swarm.md](../frameworks/kimi-code/02-swarm.md) —— 并行可组合性
-- [03-goal-mode.md](../frameworks/kimi-code/03-goal-mode.md) —— 自主性 + 持久性
-- [06-tool-system.md](../frameworks/kimi-code/06-tool-system.md) —— 约束(权限链)
-- [07-wire-protocol.md](../frameworks/kimi-code/07-wire-protocol.md) —— 持久性
-- [11-mcp.md](../frameworks/kimi-code/11-mcp.md) —— MCP 工具层
-- [16-acp-ide.md](../frameworks/kimi-code/16-acp-ide.md) —— ACP 客户端层
+A2A 协议:
+- Agent Card = **约束**(能力声明)
+- Task lifecycle = **恢复**(状态可追踪)
+
+### Grok Build(我自己)
+
+- Doom loop 检测 = **恢复**(abort + retry)
+- Skeptic panel = **验证**(对抗审查)
+- Circuit breaker = **恢复**(熔断 + 冷却)
+- Sandbox = **隔离**(物理隔离)
+- Compaction = **压缩**(两遍压缩)
+- Stop detector = **约束**(检测过早放弃)
+
+**所有大厂的设计,无一例外,都是五种反熵策略的具体实现。**
+
+---
+
+## 10. 参考资料
+
+### 本仓库的拆解(反熵的证据)
+
+kimi-code(25 篇):
+- [01-architecture.md](../frameworks/kimi-code/01-architecture.md) —— DI × Scope(反状态熵)
+- [03-goal-mode.md](../frameworks/kimi-code/03-goal-mode.md) —— goal 状态机(反行为熵)
+- [06-tool-system.md](../frameworks/kimi-code/06-tool-system.md) —— 权限链(反错误熵)
+- [07-wire-protocol.md](../frameworks/kimi-code/07-wire-protocol.md) —— Op/Model(反状态熵)
+- [08-context-memory.md](../frameworks/kimi-code/08-context-memory.md) —— Compaction(反上下文熵)
+- [24-harness-testing.md](../frameworks/kimi-code/24-harness-testing.md) —— 测试(反错误熵)
+- [25-eval-benchmark.md](../frameworks/kimi-code/25-eval-benchmark.md) —— 评测(反行为熵)
+
+grok-build(10 篇):
+- [02-doom-loop.md](../frameworks/grok-build/02-doom-loop.md) —— Doom loop(反行为熵)
+- [03-skeptic-panel.md](../frameworks/grok-build/03-skeptic-panel.md) —— Skeptic(反错误熵)
+- [04-permission-sandbox.md](../frameworks/grok-build/04-permission-sandbox.md) —— Sandbox(反错误熵)
+- [05-sampler.md](../frameworks/grok-build/05-sampler.md) —— Circuit breaker(反错误熵)
+- [07-goal-complete.md](../frameworks/grok-build/07-goal-complete.md) —— Goal 6 子系统(反行为熵)
+- [08-compaction-two-pass.md](../frameworks/grok-build/08-compaction-two-pass.md) —— 两遍压缩(反上下文熵)
+
+### 外部参考
+
+- **Anthropic** · [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
+- **OpenAI** · [Agents SDK](https://developers.openai.com/api/docs/guides/agents)
+- **Google** · [Design patterns](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system)
+- **Schrödinger** · *What is Life?*(1944)—— "生命以负熵为食"。Agent 也是。

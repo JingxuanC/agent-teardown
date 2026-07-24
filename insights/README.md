@@ -8,7 +8,7 @@
 |---|---|---|
 | [多 agent 调度策略对比](01-multi-agent-scheduling.md) | kimi-code(swarm)、AutoGen、CrewAI、LangGraph | ✅ |
 | [CLI 渲染跨框架对比](02-cli-rendering.md) | kimi-code、Claude Code、Aider、Cursor | ✅ |
-| [Agent 本质 —— 行业全景与设计哲学](03-agent-essence.md) | Anthropic、OpenAI、Google、Kimi、智谱、DeepSeek | ✅ |
+| [Agent 本质 —— 反熵增](03-agent-essence.md) | 六大厂 + kimi-code + grok-build 35 篇拆解 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
 | Plan mode / 审批沙箱 | kimi-code、Claude Code、Cursor | ⏳ |
