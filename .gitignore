@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+*.bak
+.cache/
+
+# 拆解过程中的临时笔记(不想 commit 的草稿)
+_draft/
