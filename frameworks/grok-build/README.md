@@ -11,7 +11,7 @@ Grok Build(`grok`)是 SpaceXAI 的终端 AI coding agent —— Rust 实现。�
 | # | 模块 | 状态 | 核心问题 |
 |---|---|---|---|
 | 01 | [架构总览](01-architecture.md) | ✅ | crate 分层 + 和 kimi-code 对比 |
-| 02 | Doom Loop 检测 | ⏳ | 服务端信号 + 客户端检测 + mid-stream abort |
+| 02 | [Doom Loop 检测](02-doom-loop.md) | ✅ | 服务端信号 + mid-stream abort + 预算化恢复 |
 | 03 | Skeptic Panel | ⏳ | goal 完成的对抗验证 |
 | 04 | Permission + Sandbox | ⏳ | shell parser + 双层防护 |
 | 05 | Sampler(LLM 调用) | ⏳ | SSE 解析 + circuit breaker |
