@@ -71,11 +71,11 @@ stateDiagram-v2
     [*] --> pending: connect()
     pending --> connected: 握手 + listTools 成功
     pending --> failed: 连接/认证/listTools 失败
-    pending --> needs-auth: 401 未授权
+    pending --> needsAuth: 401 未授权
     connected --> failed: 意外断开
     connected --> pending: reconnect()
     failed --> pending: reconnect()
-    needs-auth --> pending: OAuth 完成后 reconnect
+    needsAuth --> pending: OAuth 完成后 reconnect
     connected --> disabled: remove()
     failed --> disabled: remove()
 ```
