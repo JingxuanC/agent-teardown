@@ -10,8 +10,8 @@ Kimi Code CLI 是 Moonshot AI 开源的终端 AI agent(`MoonshotAI/kimi-code`,Ty
 
 | # | 模块 | 状态 | 核心问题 |
 |---|---|---|---|
-| 01 | 架构总览 | ⏳ | DI × Scope 分层、wire 协议、agent lifecycle |
-| 02 | [Swarm 群体智能](02-swarm.md) | 🔄 | 如何启动 128 个并行 subagent,如何应对 rate limit |
+| 01 | [架构总览](01-architecture.md) | ✅ | DI × Scope 分层、wire 协议、agent lifecycle |
+| 02 | [Swarm 群体智能](02-swarm.md) | ✅ | 如何启动 128 个并行 subagent,如何应对 rate limit |
 | 03 | Goal Mode | ⏳ | 自治多轮驱动的状态机 |
 | 04 | Subagent 系统 | ⏳ | spawn / resume / retry / scope 隔离 |
 | 05 | Plan Mode | ⏳ | EnterPlanMode → ExitPlanMode 的权限沙箱 |
@@ -23,6 +23,8 @@ Kimi Code CLI 是 Moonshot AI 开源的终端 AI agent(`MoonshotAI/kimi-code`,Ty
 
 (拆解过程中沉淀的"啊哈"时刻,按发现时间倒序)
 
+- **架构地基 = DI × Scope 树 + Op/Model wire 协议**。三层 Scope(App/Session/Agent)+ "子可见父、父不可见子"的铁律,把几百个 service 组织成 DAG。详见 [01-architecture.md](01-architecture.md)。
+- **循环依赖是硬约束**:容器主动抛 `CyclicDependencyError`,逼你重构,而不是用 Proxy 软化。这是非常强的设计立场。
 - **Swarm 不是协作,是批处理**:128 个子 agent 各自独立工作,通过模板 + items 切片,不互相通信。真正的协作在 goal mode(单 agent 自治多轮)。
 - **三层并发控制**:`INITIAL_LAUNCH_LIMIT=5`(启动期)→ `maxConcurrency`(整体)→ `rateLimitCapacity`(退避后的自愈容量)。
 - **Rate limit 退避是独立的调度模式**:一旦 provider 返回 429,调度器切到完全不同的代码路径(`scheduleRateLimitLaunch` vs `scheduleNormalLaunch`),带容量自适应恢复。
