@@ -1,8 +1,11 @@
 # Kimi Code · CLI/TUI 渲染系统拆解
 
-**源码位置**:`apps/kimi-code/src/tui/` + `packages/pi-tui/`(自研底层 TUI 框架)
-**核心文件**:`kimi-tui.ts`(coordinator)、`controllers/streaming-ui.ts`(流式渲染)、`controllers/session-event-handler.ts`(事件分发)
-**配套 Skill**:`.agents/skills/write-tui/SKILL.md`(自己有专门 skill,说明这是核心能力)
+> 📁 **源码位置** · `apps/kimi-code/src/tui/` + `packages/pi-tui/`(自研底层 TUI 框架)
+>
+> 📄 **核心文件** · `kimi-tui.ts`(coordinator)、`controllers/streaming-ui.ts`(流式渲染)、`controllers/session-event-handler.ts`(事件分发)
+>
+> • **配套 Skill** · `.agents/skills/write-tui/SKILL.md`(自己有专门 skill,说明这是核心能力)
+
 
 ## 1. 这个模块要解决什么问题
 

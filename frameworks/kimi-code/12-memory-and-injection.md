@@ -2,16 +2,11 @@
 
 > 本篇合并两个紧密耦合的主题:**记忆管理**(数据怎么存、怎么恢复、跨 session 怎么查)和**上下文注入**(每次请求 LLM 时 system prompt 怎么装配)。
 
-**源码位置**:
-- 记忆:`packages/agent-core-v2/src/session/sessionMetadata/` + `packages/agent-core-v2/src/persistence/` + `packages/agent-core-v2/src/app/sessionIndex/` + `packages/agent-core-v2/src/agent/blob/`
-- 注入:`packages/agent-core-v2/src/app/agentProfileCatalog/` + `packages/agent-core-v2/src/agent/profile/` + `packages/agent-core-v2/src/agent/contextInjector/`
-
-**核心文件**:
-- `sessionMetadata.ts`(60 行)、`sessionMetadataService.ts`
-- `system.md`(系统提示词模板,150+ 行,**必读**)
-- `profile-shared.ts`(40 行,system prompt 装配)
-- `agentProfileCatalog.ts`(profile 定义)
-- `fileStorageService.ts`、`atomicDocumentStore.ts`、`appendLogStore.ts`、`blobStoreService.ts`
+> 📁 **源码位置**
+> - **记忆** · `session/sessionMetadata/` + `persistence/` + `app/sessionIndex/` + `agent/blob/`
+> - **注入** · `app/agentProfileCatalog/` + `agent/profile/` + `agent/contextInjector/`
+>
+> 📄 **核心文件** · `sessionMetadata.ts` · `system.md`(模板,**必读**) · `profile-shared.ts`(装配) · `agentProfileCatalog.ts`(profile) · `fileStorageService.ts` · `atomicDocumentStore.ts` · `appendLogStore.ts` · `blobStoreService.ts`
 
 ## 1. 两个问题
 

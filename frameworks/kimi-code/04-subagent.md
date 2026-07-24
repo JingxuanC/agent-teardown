@@ -1,8 +1,11 @@
 # Kimi Code · Subagent 系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/session/subagent/` + `packages/agent-core-v2/src/session/agentLifecycle/`
-**核心文件**:`agentLifecycleService.ts`(337 行)、`runAgentTurn.ts`(233 行)、`mirrorAgentRun.ts`(188 行)、`subagentService.ts`(80 行)
-**工具**:`Agent`(单子 agent)、`AgentSwarm`(批量子 agent,见 [02-swarm.md](02-swarm.md))
+> 📁 **源码位置** · `packages/agent-core-v2/src/session/subagent/` + `packages/agent-core-v2/src/session/agentLifecycle/`
+>
+> 📄 **核心文件** · `agentLifecycleService.ts`(337 行)、`runAgentTurn.ts`(233 行)、`mirrorAgentRun.ts`(188 行)、`subagentService.ts`(80 行)
+>
+> • **工具** · `Agent`(单子 agent)、`AgentSwarm`(批量子 agent,见 [02-swarm.md](02-swarm.md))
+
 
 ## 1. 这个模块要解决什么问题
 

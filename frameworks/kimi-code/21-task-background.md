@@ -1,7 +1,9 @@
 # Kimi Code · 后台 Task 系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/task/`(15 个文件)
-**核心文件**:`task.ts`、`taskService.ts`、`backgroundTask.ts`、`agentTask.ts`
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/task/`(15 个文件)
+>
+> 📄 **核心文件** · `task.ts`、`taskService.ts`、`backgroundTask.ts`、`agentTask.ts`
+
 
 ## 1. 两种后台工作
 

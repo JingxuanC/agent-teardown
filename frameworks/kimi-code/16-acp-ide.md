@@ -1,7 +1,9 @@
 # Kimi Code · ACP / IDE 集成拆解
 
-**源码位置**:`packages/acp-adapter/`(独立包,适配 ACP 协议)
-**核心文件**:`packages/acp-adapter/src/session.ts`(780+ 行)、`packages/acp-adapter/src/auth.ts`
+> 📁 **源码位置** · `packages/acp-adapter/`(独立包,适配 ACP 协议)
+>
+> 📄 **核心文件** · `packages/acp-adapter/src/session.ts`(780+ 行)、`packages/acp-adapter/src/auth.ts`
+
 
 ## 1. 为什么需要 ACP?
 

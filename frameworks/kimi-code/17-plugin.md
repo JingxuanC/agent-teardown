@@ -1,7 +1,9 @@
 # Kimi Code · 插件系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/app/plugin/` + `packages/agent-core-v2/src/agent/plugin/`
-**核心文件**:`pluginService.ts`、`pluginCatalog.ts`
+> 📁 **源码位置** · `packages/agent-core-v2/src/app/plugin/` + `packages/agent-core-v2/src/agent/plugin/`
+>
+> 📄 **核心文件** · `pluginService.ts`、`pluginCatalog.ts`
+
 
 ## 1. 插件能贡献什么?
 

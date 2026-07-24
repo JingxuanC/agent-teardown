@@ -1,7 +1,9 @@
 # Kimi Code · 媒体/图片处理拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/media/`(13 个文件)
-**核心文件**:`imageStore.ts`、`imageConfigBridge.ts`、`registerMediaTools.ts`、`image-originals.ts`
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/media/`(13 个文件)
+>
+> 📄 **核心文件** · `imageStore.ts`、`imageConfigBridge.ts`、`registerMediaTools.ts`、`image-originals.ts`
+
 
 ## 1. 处理的三种媒体
 

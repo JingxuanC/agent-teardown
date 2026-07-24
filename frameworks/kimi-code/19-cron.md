@@ -1,7 +1,9 @@
 # Kimi Code · Cron / 定时任务系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/cron/`(legacy) + `packages/agent-core-v2/src/session/cron/`(v2)
-**核心文件**:`manager.ts`(400+ 行,CronManager)、`sessionCronStore.ts`(持久化)、`createCronScheduler.ts`
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/cron/`(legacy) + `packages/agent-core-v2/src/session/cron/`(v2)
+>
+> 📄 **核心文件** · `manager.ts`(400+ 行,CronManager)、`sessionCronStore.ts`(持久化)、`createCronScheduler.ts`
+
 
 ## 1. 为什么 Agent 需要 Cron?
 

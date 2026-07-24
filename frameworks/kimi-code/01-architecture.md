@@ -2,9 +2,11 @@
 
 > 本篇是 kimi-code 拆解的**地基**。后续所有模块拆解(swarm、goal、subagent、loop...)都会引用本篇定义的概念。如果你只读一篇,读这篇。
 
-**源码位置**:`packages/agent-core-v2/`(新一代引擎,TS)
-**设计文档**:`packages/agent-core-v2/docs/di.md` + `service-design.md`(写得非常清楚,强烈推荐)
-**拆解基线**:main 分支(2026-07)
+> 📁 **源码位置** · `packages/agent-core-v2/`(新一代引擎,TS)
+>
+> 📚 **设计文档** · `packages/agent-core-v2/docs/di.md` + `service-design.md`(写得非常清楚,强烈推荐)
+>
+> 🔖 **拆解基线** · main 分支(2026-07)
 
 ## 1. 这个项目要解决什么问题
 

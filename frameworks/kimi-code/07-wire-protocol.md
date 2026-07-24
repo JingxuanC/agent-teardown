@@ -1,9 +1,13 @@
 # Kimi Code · Wire 协议与 Op/Model 持久化架构拆解
 
-**源码位置**:`packages/agent-core-v2/src/wire/`
-**核心文件**:`model.ts`(107 行)、`op.ts`(126 行)、`wireService.ts`(335 行)、`record.ts`(68 行)
-**设计文档**:`packages/agent-core-v2/docs/rw-model-design.md`(必读,详细的提案稿)
-**Scope 绑定**:Agent scope(每个 agent 一条独立的 wire log)
+> 📁 **源码位置** · `packages/agent-core-v2/src/wire/`
+>
+> 📄 **核心文件** · `model.ts`(107 行)、`op.ts`(126 行)、`wireService.ts`(335 行)、`record.ts`(68 行)
+>
+> 📚 **设计文档** · `packages/agent-core-v2/docs/rw-model-design.md`(必读,详细的提案稿)
+>
+> 🔌 **Scope 绑定** · Agent scope(每个 agent 一条独立的 wire log)
+
 
 > 本篇是整个 kimi-code 架构的**神经中枢**。前面所有拆解(swarm 的 SwarmModel、goal 的 GoalModel、plan 的 PlanModel)都建立在本篇描述的机制之上。
 

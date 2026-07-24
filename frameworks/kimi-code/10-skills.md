@@ -1,8 +1,11 @@
 # Kimi Code · Skills 系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/app/skillCatalog/` + `packages/agent-core-v2/src/session/sessionSkillCatalog/` + `packages/agent-core-v2/src/agent/skill/`
-**核心文件**:`registry.ts`(289 行)、`fileSkillDiscovery.ts`(235 行)、`parser.ts`(203 行)、`skillRoots.ts`(140 行)、`skillService.ts`(143 行)
-**Scope 绑定**:Catalog 是 App scope;session 级合并是 Session scope;激活是 Agent scope
+> 📁 **源码位置** · `packages/agent-core-v2/src/app/skillCatalog/` + `packages/agent-core-v2/src/session/sessionSkillCatalog/` + `packages/agent-core-v2/src/agent/skill/`
+>
+> 📄 **核心文件** · `registry.ts`(289 行)、`fileSkillDiscovery.ts`(235 行)、`parser.ts`(203 行)、`skillRoots.ts`(140 行)、`skillService.ts`(143 行)
+>
+> 🔌 **Scope 绑定** · Catalog 是 App scope;session 级合并是 Session scope;激活是 Agent scope
+
 
 ## 1. 这个模块要解决什么问题
 

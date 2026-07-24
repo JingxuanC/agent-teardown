@@ -1,8 +1,11 @@
 # Kimi Code · Swarm 群体智能拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/swarm/` 与 `packages/agent-core-v2/src/session/swarm/`
-**核心文件**:`agentRunBatch.ts`(644 行)、`sessionSwarmService.ts`(271 行)、`agent-swarm.ts`(工具入口)
-**对应 Python 版**:`packages/agent-core/src/session/subagent-batch.ts`(legacy)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/swarm/` 与 `packages/agent-core-v2/src/session/swarm/`
+>
+> 📄 **核心文件** · `agentRunBatch.ts`(644 行)、`sessionSwarmService.ts`(271 行)、`agent-swarm.ts`(工具入口)
+>
+> • **对应 Python 版** · `packages/agent-core/src/session/subagent-batch.ts`(legacy)
+
 
 ## 1. 这个模块要解决什么问题
 

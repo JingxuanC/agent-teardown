@@ -1,8 +1,11 @@
 # Kimi Code · 工具系统与权限责任链拆解
 
-**源码位置**:`packages/agent-core-v2/src/tool/` + `packages/agent-core-v2/src/agent/toolRegistry/` + `packages/agent-core-v2/src/agent/toolExecutor/` + `packages/agent-core-v2/src/agent/permissionPolicy/`
-**核心文件**:`toolContract.ts`(235 行,工具协议)、`toolExecutorService.ts`(901 行,执行器)、`Permission.md`(设计文档,必读)
-**Scope 绑定**:Agent scope(每个 agent 有独立的工具注册表)
+> 📁 **源码位置** · `packages/agent-core-v2/src/tool/` + `packages/agent-core-v2/src/agent/toolRegistry/` + `packages/agent-core-v2/src/agent/toolExecutor/` + `packages/agent-core-v2/src/agent/permissionPolicy/`
+>
+> 📄 **核心文件** · `toolContract.ts`(235 行,工具协议)、`toolExecutorService.ts`(901 行,执行器)、`Permission.md`(设计文档,必读)
+>
+> 🔌 **Scope 绑定** · Agent scope(每个 agent 有独立的工具注册表)
+
 
 ## 1. 这个模块要解决什么问题
 

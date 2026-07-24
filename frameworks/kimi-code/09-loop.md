@@ -1,8 +1,11 @@
 # Kimi Code · Agent Loop 主循环拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/loop/` + `packages/agent-core-v2/src/agent/prompt/` + `packages/agent-core-v2/src/agent/stepRetry/`
-**核心文件**:`loopService.ts`(1064 行,核心)、`promptService.ts`(247 行)、`stepRetryService.ts`(139 行)、`turnEvents.ts`(129 行)
-**Scope 绑定**:Agent scope(每个 agent 独立的 loop)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/loop/` + `packages/agent-core-v2/src/agent/prompt/` + `packages/agent-core-v2/src/agent/stepRetry/`
+>
+> 📄 **核心文件** · `loopService.ts`(1064 行,核心)、`promptService.ts`(247 行)、`stepRetryService.ts`(139 行)、`turnEvents.ts`(129 行)
+>
+> 🔌 **Scope 绑定** · Agent scope(每个 agent 独立的 loop)
+
 
 ## 1. 这个模块要解决什么问题
 

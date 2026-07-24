@@ -1,8 +1,11 @@
 # Kimi Code · MCP 集成拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/mcp/` + `packages/agent-core-v2/src/session/mcp/`
-**核心文件**:`connection-manager.ts`(484 行,连接管理)、`mcpService.ts`(362 行,agent 层注册)、`client-stdio.ts`(182 行)、`client-http.ts`(153 行)、`client-sse.ts`(145 行)、`oauth/service.ts`
-**Scope 绑定**:Session scope 管理连接;Agent scope 注册工具
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/mcp/` + `packages/agent-core-v2/src/session/mcp/`
+>
+> 📄 **核心文件** · `connection-manager.ts`(484 行,连接管理)、`mcpService.ts`(362 行,agent 层注册)、`client-stdio.ts`(182 行)、`client-http.ts`(153 行)、`client-sse.ts`(145 行)、`oauth/service.ts`
+>
+> 🔌 **Scope 绑定** · Session scope 管理连接;Agent scope 注册工具
+
 
 ## 1. 这个模块要解决什么问题
 

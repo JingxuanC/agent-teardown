@@ -1,7 +1,9 @@
 # Kimi Code · Hook 系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/externalHooks/`
-**核心文件**:`externalHooksService.ts` + `src/session/externalHooks/`(session 级适配)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/externalHooks/`
+>
+> 📄 **核心文件** · `externalHooksService.ts` + `src/session/externalHooks/`(session 级适配)
+
 
 ## 1. Hook 是什么?
 

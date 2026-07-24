@@ -1,8 +1,11 @@
 # Kimi Code · 错误系统拆解
 
-**源码位置**:`packages/agent-core-v2/src/_base/errors/` + 各域的 `errors.ts` + `src/errors.ts`(facade)
-**核心文件**:`errors.ts`(75 行,base 类)、`codes.ts`、`serialize.ts`(107 行)、`docs/errors.md`(必读)
-**设计哲学**:**编码化错误 + 域归属 + 边界翻译 + 序列化友好**
+> 📁 **源码位置** · `packages/agent-core-v2/src/_base/errors/` + 各域的 `errors.ts` + `src/errors.ts`(facade)
+>
+> 📄 **核心文件** · `errors.ts`(75 行,base 类)、`codes.ts`、`serialize.ts`(107 行)、`docs/errors.md`(必读)
+>
+> • **设计哲学** · **编码化错误 + 域归属 + 边界翻译 + 序列化友好**
+
 
 ## 1. 为什么 agent 框架需要专门的错误系统?
 

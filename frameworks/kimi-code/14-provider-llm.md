@@ -1,7 +1,9 @@
 # Kimi Code · Provider/kosong LLM 抽象层拆解
 
-**源码位置**:`packages/kosong/`(独立包,8000+ 行)+ `packages/agent-core-v2/src/app/llmProtocol/`(集成层)
-**核心文件**:`provider.ts`(274 行,核心接口)、`generate.ts`(365 行,流式生成)、`providers/anthropic.ts`(1297 行)、`providers/openai-responses.ts`(1199 行)、`providers/google-genai.ts`(988 行)、`providers/kimi.ts`(659 行)
+> 📁 **源码位置** · `packages/kosong/`(独立包,8000+ 行)+ `packages/agent-core-v2/src/app/llmProtocol/`(集成层)
+>
+> 📄 **核心文件** · `provider.ts`(274 行,核心接口)、`generate.ts`(365 行,流式生成)、`providers/anthropic.ts`(1297 行)、`providers/openai-responses.ts`(1199 行)、`providers/google-genai.ts`(988 行)、`providers/kimi.ts`(659 行)
+
 
 ## 1. 这个模块要解决什么问题
 

@@ -1,7 +1,9 @@
 # Kimi Code · Telemetry 与隐私拆解
 
-**源码位置**:`packages/agent-core-v2/src/app/telemetry/`
-**核心文件**:`telemetry.ts`、`events.ts`(事件注册表)、`agentTelemetryContext.ts`、`cloudAppender.ts`
+> 📁 **源码位置** · `packages/agent-core-v2/src/app/telemetry/`
+>
+> 📄 **核心文件** · `telemetry.ts`、`events.ts`(事件注册表)、`agentTelemetryContext.ts`、`cloudAppender.ts`
+
 
 ## 1. 为什么 Agent 框架需要 Telemetry?
 

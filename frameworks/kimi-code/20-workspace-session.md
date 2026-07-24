@@ -1,6 +1,7 @@
 # Kimi Code · Workspace / Session 生命周期拆解
 
-**源码位置**:`packages/agent-core-v2/src/app/workspaceRegistry/` + `src/app/sessionLifecycle/` + `src/session/sessionLifecycle/`
+> 📁 **源码位置** · `packages/agent-core-v2/src/app/workspaceRegistry/` + `src/app/sessionLifecycle/` + `src/session/sessionLifecycle/`
+
 
 ## 1. 三层组织
 

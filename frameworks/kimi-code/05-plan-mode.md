@@ -1,9 +1,13 @@
 # Kimi Code · Plan Mode 与权限沙箱拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/plan/`
-**核心文件**:`planService.ts`(166 行)、`planModeInjection.ts`(113 行)、`tools/exit-plan-mode.ts`(237 行)
-**工具**:`EnterPlanMode`、`ExitPlanMode`
-**Scope 绑定**:Agent scope(每个 agent 独立的 plan mode 状态)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/plan/`
+>
+> 📄 **核心文件** · `planService.ts`(166 行)、`planModeInjection.ts`(113 行)、`tools/exit-plan-mode.ts`(237 行)
+>
+> • **工具** · `EnterPlanMode`、`ExitPlanMode`
+>
+> 🔌 **Scope 绑定** · Agent scope(每个 agent 独立的 plan mode 状态)
+
 
 ## 1. 这个模块要解决什么问题
 

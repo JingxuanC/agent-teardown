@@ -1,9 +1,13 @@
 # Kimi Code · Goal Mode 自治状态机拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/goal/`
-**核心文件**:`goalService.ts`(1153 行)、`goalOps.ts`(170 行)、`types.ts`(64 行)
-**工具**:`CreateGoal`、`UpdateGoal`、`GetGoal`、`SetGoalBudget`
-**GOAL.md 设计文档**:`~/kimi-code/GOAL.md`(完整的目标规划文档,非常推荐读)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/goal/`
+>
+> 📄 **核心文件** · `goalService.ts`(1153 行)、`goalOps.ts`(170 行)、`types.ts`(64 行)
+>
+> • **工具** · `CreateGoal`、`UpdateGoal`、`GetGoal`、`SetGoalBudget`
+>
+> 📚 **GOAL.md 设计文档** · `~/kimi-code/GOAL.md`(完整的目标规划文档,非常推荐读)
+
 
 ## 1. 这个模块要解决什么问题
 

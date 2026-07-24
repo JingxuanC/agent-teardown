@@ -1,8 +1,11 @@
 # Kimi Code · Context Memory 与 Compaction 拆解
 
-**源码位置**:`packages/agent-core-v2/src/agent/contextMemory/` + `packages/agent-core-v2/src/agent/fullCompaction/` + `packages/agent-core-v2/src/agent/contextInjector/`
-**核心文件**:`contextMemoryService.ts`(164 行)、`fullCompactionService.ts`(799 行)、`strategy.ts`(260 行)、`compaction-instruction.md`(LLM 指令)
-**Scope 绑定**:Agent scope(每个 agent 独立的 context)
+> 📁 **源码位置** · `packages/agent-core-v2/src/agent/contextMemory/` + `packages/agent-core-v2/src/agent/fullCompaction/` + `packages/agent-core-v2/src/agent/contextInjector/`
+>
+> 📄 **核心文件** · `contextMemoryService.ts`(164 行)、`fullCompactionService.ts`(799 行)、`strategy.ts`(260 行)、`compaction-instruction.md`(LLM 指令)
+>
+> 🔌 **Scope 绑定** · Agent scope(每个 agent 独立的 context)
+
 
 ## 1. 这个模块要解决什么问题
 
