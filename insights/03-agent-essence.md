@@ -317,9 +317,131 @@ grok-build(10 篇):
 - [07-goal-complete.md](../frameworks/grok-build/07-goal-complete.md) —— Goal 6 子系统(反行为熵)
 - [08-compaction-two-pass.md](../frameworks/grok-build/08-compaction-two-pass.md) —— 两遍压缩(反上下文熵)
 
+---
+
+## 11. Agent 与植物 —— 一个更深的类比
+
+> 一个 agent 能持续工作而不崩溃,和一株植物能持续生长而不枯萎,在热力学上是同一件事。
+
+这不是修辞。这是字面意义上的同构。下面逐层展开。
+
+### 11.1 为什么是植物,不是机器?
+
+我们习惯把软件比作"机器":输入 → 处理 → 输出,确定的、可逆的、不会自己退化的。
+
+但 agent **不是机器**。机器是封闭系统(不与环境交换),热力学第二定律对它说的是"你不碰它,它就不会变"。agent 是**开放系统** —— 它不断从环境接收信息(用户输入、工具结果),不断向环境输出动作(文件修改、命令执行),内部状态持续膨胀。
+
+开放系统的热力学和封闭系统完全不同。生命体是典型的开放系统。Schrödinger 在 1944 年的 *What is Life?* 里指出:
+
+> 生命有机体如何避免衰退到热力学平衡(即"死亡")?答案是:**通过吃负熵**。有机体以负熵为食。
+
+植物怎么做?
+
+- **吸收阳光**(能量输入)→ 光合作用 → 把低能量的 CO₂ + H₂O 合成高能量的葡萄糖(局部熵减)
+- **吸收水分和矿物质**(物质输入)→ 维持细胞结构
+- **排泄热量和废物**(熵排出)→ 把内部产生的熵丢弃到环境中
+- **DNA 修复**(错误纠正)→ 对抗复制错误累积
+- **细胞凋亡**(程序性死亡)→ 牺牲失控细胞,保护整体
+
+Agent 怎么做?
+
+- **消耗 LLM 算力**(能量输入)→ compaction → 把冗长的对话压缩成精炼的 handoff(局部熵减)
+- **注入 system prompt + reminder**(信息输入)→ 维持目标方向
+- **丢弃旧消息 + 旧工具结果**(熵排出)→ 把不再需要的上下文移出 context
+- **Skeptic panel + 错误归一化**(错误纠正)→ 对抗 LLM 的不可靠判断
+- **Abort + rewind + circuit breaker**(程序性丢弃)→ 牺牲当前 turn,保护整体 session
+
+**结构完全同构**:
+
+| 植物 | Agent | 热力学角色 |
+|---|---|---|
+| 阳光 | LLM 算力(token 成本) | **能量输入**(负熵的来源) |
+| 光合作用 | Compaction / handoff | **局部熵减**(把混乱合成秩序) |
+| 根系吸收 | System prompt + reminder 注入 | **物质/信息输入**(维持结构) |
+| 蒸腾作用 | 旧消息丢弃 / 折叠 | **熵排出**(把内部熵丢给环境) |
+| DNA 修复 | Skeptic panel + 错误归一化 | **错误纠正**(对抗变异累积) |
+| 细胞凋亡 | Abort + rewind + kill task | **程序性丢弃**(牺牲局部保护整体) |
+| 季节性落叶 | Context compaction | **周期性重置**(防止无限膨胀) |
+| 向光性 | Goal continuation driver | **趋向性**(朝目标方向生长) |
+| 免疫系统 | Permission + sandbox | **防御系统**(对抗外部入侵) |
+
+### 11.2 为什么这个类比重要?
+
+不是为了"听起来深刻"。这个类比有**三个实际推论**:
+
+**推论 1:Agent 需要"代谢"**
+
+植物不"存储阳光",它把阳光**持续转化**成化学能。同样,agent 不能"存一次 context 就用到底",它必须**持续压缩、持续验证、持续恢复**。停止代谢 = 死亡。
+
+这就是为什么 kimi-code 和 grok-build 都有 **continuation driver**(每轮重新注入目标)、**compaction**(周期性压缩)、**reminder variant**(动态调整注入量)—— 这些不是"功能",是 agent 的**新陈代谢**。
+
+**推论 2:Agent 的"寿命"由反熵能力决定**
+
+一株植物的寿命由它的**代谢效率**决定(不是基因有多复杂)。一棵 5000 年的狐尾松,不是因为它基因好,是因为它**修复损伤和抵抗熵增的效率极高**。
+
+同样,一个 agent 能跑多久不崩溃,**不是由 LLM 的智商决定,是由反熵措施的效率决定**。一个 70 分 LLM + 优秀反熵(good compaction + skeptic + checkpoint)的 agent,比 99 分 LLM + 糟糕反熵(无压缩、无验证、无恢复)的 agent 跑得更久更稳。
+
+**推论 3:Agent 会"死亡"**
+
+植物会死(熵增超过代谢能力)。Agent 也会"死":
+- **Context 热寂**:compaction 失效,context 塞满无用信息,agent 无法继续
+- **Doom loop**:行为熵超过检测能力,agent 陷入永久循环
+- **状态腐败**:wire log / SQLite 损坏,无法恢复
+- **预算耗尽**:token/时间预算用完,agent 被迫停止
+
+理解了 agent 会"死",才能设计出让它"活更久"的系统。
+
+### 11.3 从热力学到工程
+
+| 热力学概念 | Agent 工程 |
+|---|---|
+| 熵(entropy) | context 长度 / 状态复杂度 / 错误率 |
+| 负熵(negentropy) | compaction 产物 / checkpoint / handoff note |
+| 能量输入 | LLM 调用(花钱买负熵) |
+| 开放系统 | agent 持续与环境交互 |
+| 热平衡(死亡) | context 塞满 / doom loop / 状态腐败 |
+| 耗散结构 | agent 的稳定运行态(需要持续能量维持) |
+| 自组织 | goal continuation / strategist 重组 |
+| 信息熵 | context 中信息的有效比特率(信噪比) |
+
+**agent 是一个耗散结构**(dissipative structure)—— Ilya Prigogine 的概念:一个远离热力学平衡的开放系统,通过持续的能量耗散来维持有序结构。飓风是耗散结构,生命是耗散结构,agent 也是。
+
+### 11.4 最终的一句话
+
+> **Agent 是一个数字生命体。**
+>
+> 它和一株植物一样,在不可逆的熵增中,通过持续吸收能量(LLM 算力)、排出熵(旧消息丢弃)、修复损伤(skeptic 验证)、对抗入侵(sandbox 隔离),维持着一种远离平衡的有序状态——这种状态叫做"正在工作"。
+>
+> 理解了这一点,就理解了为什么 agent 框架的 95% 代码不是"让 LLM 更聪明",而是"让系统不崩溃"。
+
+---
+
+## 12. 参考资料
+
+### 本仓库的拆解(反熵的证据)
+
+kimi-code(25 篇):
+- [01-architecture.md](../frameworks/kimi-code/01-architecture.md) —— DI × Scope(反状态熵)
+- [03-goal-mode.md](../frameworks/kimi-code/03-goal-mode.md) —— goal 状态机(反行为熵)
+- [06-tool-system.md](../frameworks/kimi-code/06-tool-system.md) —— 权限链(反错误熵)
+- [07-wire-protocol.md](../frameworks/kimi-code/07-wire-protocol.md) —— Op/Model(反状态熵)
+- [08-context-memory.md](../frameworks/kimi-code/08-context-memory.md) —— Compaction(反上下文熵)
+- [24-harness-testing.md](../frameworks/kimi-code/24-harness-testing.md) —— 测试(反错误熵)
+- [25-eval-benchmark.md](../frameworks/kimi-code/25-eval-benchmark.md) —— 评测(反行为熵)
+
+grok-build(10 篇):
+- [02-doom-loop.md](../frameworks/grok-build/02-doom-loop.md) —— Doom loop(反行为熵)
+- [03-skeptic-panel.md](../frameworks/grok-build/03-skeptic-panel.md) —— Skeptic(反错误熵)
+- [04-permission-sandbox.md](../frameworks/grok-build/04-permission-sandbox.md) —— Sandbox(反错误熵)
+- [05-sampler.md](../frameworks/grok-build/05-sampler.md) —— Circuit breaker(反错误熵)
+- [07-goal-complete.md](../frameworks/grok-build/07-goal-complete.md) —— Goal 6 子系统(反行为熵)
+- [08-compaction-two-pass.md](../frameworks/grok-build/08-compaction-two-pass.md) —— 两遍压缩(反上下文熵)
+
 ### 外部参考
 
 - **Anthropic** · [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
 - **OpenAI** · [Agents SDK](https://developers.openai.com/api/docs/guides/agents)
 - **Google** · [Design patterns](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system)
-- **Schrödinger** · *What is Life?*(1944)—— "生命以负熵为食"。Agent 也是。
+- **Schrödinger** · *What is Life?*(1944)—— "生命以负熵为食"
+- **Prigogine** · *Order Out of Chaos*(1984)—— 耗散结构理论
+- **Shannon** · *A Mathematical Theory of Communication*(1948)—— 信息熵
