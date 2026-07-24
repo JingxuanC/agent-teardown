@@ -22,6 +22,17 @@ Kimi Code CLI 是 Moonshot AI 开源的终端 AI agent(`MoonshotAI/kimi-code`,Ty
 | 10 | [Skills 系统](10-skills.md) | ✅ | 四层来源 + frontmatter 解析 + flow 流程图 + 双向激活 |
 | 11 | [MCP 集成](11-mcp.md) | ✅ | 三种 transport + 六状态机 + OAuth + attemptId 竞态保护 |
 | 12 | [记忆管理与上下文注入](12-memory-and-injection.md) | ✅ | 四种存储接口 + system.md 模板 + 运行时 reminder |
+| 13 | [CLI/TUI 渲染系统](13-tui-rendering.md) | ✅ | 脏标记节流 + 流式合并 + 折叠 + pi-tui 自研框架 |
+| 14 | [Provider/kosong LLM 抽象](14-provider-llm.md) | ✅ | 5 provider 统一 + 流式归一 + 工具调用多路复用 |
+| 15 | [错误系统](15-errors.md) | ✅ | Error2 + 去中心化 code 注册 + 边界翻译 + 序列化 |
+| 16 | [ACP/IDE 集成](16-acp-ide.md) | ✅ | JSON-RPC over stdio + 图片压缩 + slash 拦截 |
+| 17 | [插件系统](17-plugin.md) | ✅ | 标准 register API + 同进程无 sandbox |
+| 18 | [Hook 系统](18-hooks.md) | ✅ | 外部脚本扩展点 + JSON in/out + 安全失败 |
+| 19 | [Cron/定时任务](19-cron.md) | ✅ | isIdle 检查 + steer 注入 + stale 检测 + 持久化 |
+| 20 | [Workspace/Session 生命周期](20-workspace-session.md) | ✅ | 三层组织 + fork + archive + workspaceId 派生 |
+| 21 | [后台 Task 系统](21-task-background.md) | ✅ | shell/agent 两类 + 自动通知 + lost 状态 |
+| 22 | [媒体/图片处理](22-media-image.md) | ✅ | 三层存储 + 1568px 压缩 + blob 去重 + 格式检测 |
+| 23 | [Telemetry 与隐私](23-telemetry.md) | ✅ | 事件注册表 + 三层脱敏 + AsyncEventQueue |
 | 03 | Goal Mode | ⏳ | 自治多轮驱动的状态机 |
 | 04 | Subagent 系统 | ⏳ | spawn / resume / retry / scope 隔离 |
 | 05 | Plan Mode | ⏳ | EnterPlanMode → ExitPlanMode 的权限沙箱 |
