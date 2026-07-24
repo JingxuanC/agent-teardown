@@ -286,34 +286,14 @@ flowchart TB
 
 ## 9. 参考资料
 
-### 官方文档(必读)
+---
 
-- **Anthropic** · [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) · 五种 workflow 模式 + agent 定义
-- **Anthropic** · [Building Effective AI Agents PDF](https://resources.anthropic.com/hubfs/Building%20Effective%20AI%20Agents-%20Architecture%20Patterns%20and%20Implementation%20Frameworks.pdf) · 完整架构模式 + 案例
-- **OpenAI** · [Agents SDK](https://developers.openai.com/api/docs/guides/agents) · SDK 设计哲学
-- **OpenAI** · [New tools for building agents](https://openai.com/index/new-tools-for-building-agents/) · 发布博客
-- **Google** · [Choose a design pattern](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system) · 10 种设计模式
-- **Google** · [A2A Protocol](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) · 跨 Agent 互操作
-- **Google** · [ADK + A2A Codelab](https://codelabs.developers.google.com/adk-a2a-agent-runtime)
+## 参考资料
 
-### 国内大厂
+完整的参考文献（论文、博客、书籍）已集中维护在 [REFERENCES.md](REFERENCES.md)，所有链接均已验证。本篇涉及的核心参考：
 
-- **智谱** · AutoGLM 沉思(自我反思 agent)
-- **DeepSeek** · R1 推理模型 + V3.1 混合推理
-- **Kimi(Moonshot)** · kimi-code(本仓库拆解的对象)
+- Anthropic / OpenAI / Google 官方文档
+- ReAct / Reflexion / Generative Agents 论文
+- 智谱 / DeepSeek / Kimi 国内大厂
 
-### 学术
-
-- ReAct: Reasoning + Acting(Yao et al., 2022)
-- Reflexion: Language Agents with Verbal Reinforcement Learning(Shinn et al., 2023)
-- A Survey on Large Language Model based Autonomous Agents(Wang et al., 2024)
-
-### 本仓库相关拆解
-
-- [01-architecture.md](../frameworks/kimi-code/01-architecture.md) —— DI × Scope 是约束的地基
-- [02-swarm.md](../frameworks/kimi-code/02-swarm.md) —— 并行可组合性
-- [03-goal-mode.md](../frameworks/kimi-code/03-goal-mode.md) —— 自主性 + 持久性
-- [06-tool-system.md](../frameworks/kimi-code/06-tool-system.md) —— 约束(权限链)
-- [07-wire-protocol.md](../frameworks/kimi-code/07-wire-protocol.md) —— 持久性
-- [11-mcp.md](../frameworks/kimi-code/11-mcp.md) —— MCP 工具层
-- [16-acp-ide.md](../frameworks/kimi-code/16-acp-ide.md) —— ACP 客户端层
+> 完整链接见 [REFERENCES.md](REFERENCES.md)。

@@ -416,32 +416,12 @@ Agent 怎么做?
 
 ---
 
-## 12. 参考资料
+## 参考资料
 
-### 本仓库的拆解(反熵的证据)
+完整的参考文献（论文、博客、书籍）已集中维护在 [REFERENCES.md](REFERENCES.md)，所有链接均已验证。本篇涉及的核心参考：
 
-kimi-code(25 篇):
-- [01-architecture.md](../frameworks/kimi-code/01-architecture.md) —— DI × Scope(反状态熵)
-- [03-goal-mode.md](../frameworks/kimi-code/03-goal-mode.md) —— goal 状态机(反行为熵)
-- [06-tool-system.md](../frameworks/kimi-code/06-tool-system.md) —— 权限链(反错误熵)
-- [07-wire-protocol.md](../frameworks/kimi-code/07-wire-protocol.md) —— Op/Model(反状态熵)
-- [08-context-memory.md](../frameworks/kimi-code/08-context-memory.md) —— Compaction(反上下文熵)
-- [24-harness-testing.md](../frameworks/kimi-code/24-harness-testing.md) —— 测试(反错误熵)
-- [25-eval-benchmark.md](../frameworks/kimi-code/25-eval-benchmark.md) —— 评测(反行为熵)
+- Schrödinger · *What is Life?*（负熵）
+- Prigogine · *Order Out of Chaos*（耗散结构）
+- Shannon · *A Mathematical Theory of Communication*（信息熵）
 
-grok-build(10 篇):
-- [02-doom-loop.md](../frameworks/grok-build/02-doom-loop.md) —— Doom loop(反行为熵)
-- [03-skeptic-panel.md](../frameworks/grok-build/03-skeptic-panel.md) —— Skeptic(反错误熵)
-- [04-permission-sandbox.md](../frameworks/grok-build/04-permission-sandbox.md) —— Sandbox(反错误熵)
-- [05-sampler.md](../frameworks/grok-build/05-sampler.md) —— Circuit breaker(反错误熵)
-- [07-goal-complete.md](../frameworks/grok-build/07-goal-complete.md) —— Goal 6 子系统(反行为熵)
-- [08-compaction-two-pass.md](../frameworks/grok-build/08-compaction-two-pass.md) —— 两遍压缩(反上下文熵)
-
-### 外部参考
-
-- **Anthropic** · [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
-- **OpenAI** · [Agents SDK](https://developers.openai.com/api/docs/guides/agents)
-- **Google** · [Design patterns](https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system)
-- **Schrödinger** · *What is Life?*(1944)—— "生命以负熵为食"
-- **Prigogine** · *Order Out of Chaos*(1984)—— 耗散结构理论
-- **Shannon** · *A Mathematical Theory of Communication*(1948)—— 信息熵
+> 完整链接见 [REFERENCES.md](REFERENCES.md)。

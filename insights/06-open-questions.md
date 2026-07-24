@@ -201,17 +201,8 @@ agent 版本:
 
 ## 参考资料
 
-### 本仓库的相关思考
+完整的参考文献（论文、博客、书籍）已集中维护在 [REFERENCES.md](REFERENCES.md)，所有链接均已验证。本篇涉及的核心参考：
 
-- [03 行业全景](03-agent-essence.md) —— 大厂对 agent 的定义(五种特征)
-- [04 反熵增](04-anti-entropy.md) —— Agent 的第二定律 + 植物类比
-- [05 7×24 AGI](05-agi-7x24.md) —— 未来挑战(多尺度记忆 + 睡眠 + 自演化)
+- Searle / Turing / Minsky / Parfit / Russell（哲学经典）
 
-### 外部(不是代码,是思想)
-
-- **Searle** · *Minds, Brains, and Programs*(1980)—— 中文房间(理解 vs 模式匹配)
-- **Turing** · *Computing Machinery and Intelligence*(1950)—— 模仿游戏
-- **Minsky** · *The Society of Mind*(1986)—— 多 agent 心智模型
-- **Parfit** · *Reasons and Persons*(1984)—— 个人同一性(忒修斯之船)
-- **Brooks** · *Fields of the Mind*(2009)—— 具身认知
-- **Russell** · *Human Compatible*(2019)—— AI 对齐问题
+> 完整链接见 [REFERENCES.md](REFERENCES.md)。

@@ -316,25 +316,11 @@ Agent OS(但最终会消解)
 
 ## 参考资料
 
-### 学术论文
+完整的参考文献（论文、博客、书籍）已集中维护在 [REFERENCES.md](REFERENCES.md)，所有链接均已验证。本篇涉及的核心参考：
 
-- **Masi et al.** (2026) · "Understanding large language models demands moving beyond metaphors" · *Nature HSSC* · [链接](https://www.nature.com/articles/s44271-026-00508-6) —— 机器经验主义
-- **Oguntola, I.** (2025) · *Theory of Mind in Multi-Agent Systems* · CMU PhD Thesis —— ToM 分层协作
-- **Li, H. et al.** (2023) · "Theory of Mind for Multi-Agent Collaboration via Large Language Models" · EMNLP —— LLM 的 ToM 评估
-- **Mei, K. et al.** (2024) · "AIOS: LLM Agent Operating System" · arXiv:2403.16971 —— AIOS
-- **AgentOS** (2026) · "AgentOS: From Application Silos to a Natural Language-Driven Data Ecosystem" · arXiv —— AgentOS
+- Masi et al. (Nature 2026) · 机器经验主义
+- Oguntola (CMU 2025) · Theory of Mind in Multi-Agent
+- Mei et al. / AgentOS · AIOS
+- Parfit / Lakoff / Searle / Prigogine（哲学）
 
-### 哲学
-
-- **Schrödinger, E.** (1944) · *What is Life?* —— 负熵
-- **Parfit, D.** (1984) · *Reasons and Persons* —— 个人同一性
-- **Lakoff, G. & Johnson, M.** (1980) · *Metaphors We Live By* —— 经验主义认知论
-- **Searle, J.** (1980) · "Minds, Brains, and Programs" —— 中文房间
-- **Prigogine, I.** (1984) · *Order Out of Chaos* —— 耗散结构
-
-### 本仓库
-
-- [03 行业全景](03-agent-essence.md)
-- [04 反熵增](04-anti-entropy.md)
-- [05 7×24 AGI](05-agi-7x24.md)
-- [06 未解之题](06-open-questions.md) —— 这篇是它的回应
+> 完整链接见 [REFERENCES.md](REFERENCES.md)。
