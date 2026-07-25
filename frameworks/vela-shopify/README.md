@@ -11,6 +11,7 @@ Vela 是一个**生产级 7×24 电商 AI agent**。Go 实现，~30K 行 agent �
 |---|---|---|---|
 | 01 | [架构总览](01-architecture.md) | ✅ | DAG 编排 + 多策略 + 记忆衰减 + AutoGoal + K8s 沙箱 + 七框架对比 |
 | 02 | [深度模块拆解](02-deep-modules.md) | ✅ | ReAct+DAG+Gate+Guard / 记忆12文件(reflect+decay+RRF) / AutoGoal+Verifier / 五策略+Circuit Breaker |
+| 03 | [多 Agent 系统(修正)](03-multiagent-correction.md) | ✅ | DAG-of-Agents + 共享黑板 Workspace + HITL 人在环路 + DAGRunStore 持久化 |
 
 ## 关键发现速览
 
