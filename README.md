@@ -22,6 +22,7 @@ insights/         # 跨框架对比与抽象出的设计模式
 | [kimi-code](frameworks/kimi-code/) | TypeScript | ✅ 25 篇完成 | wire/Op/goal/swarm/harness/eval |
 | [grok-build](frameworks/grok-build/) | Rust | ✅ 10 篇完成 | doom loop/skeptic panel/circuit breaker/sandbox |
 | [pi](frameworks/pi/) | TypeScript | ✅ 1 篇 | Session Tree/branch summarization/最信任 LLM/8+ provider |
+| [codex](frameworks/codex/) | Rust | ✅ 1 篇 | 云任务/agent identity/双阶段记忆/4平台沙箱/execpolicy DSL |
 
 未来可能加入:Claude Code、Cursor、Aider、OpenAI Codex、Devin、Goose 等。
 
