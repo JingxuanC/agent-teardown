@@ -13,6 +13,7 @@
 | 04 | [react-oracle-gate.md](04-react-oracle-gate.md) | Oracle 路由(领域分类+预算)+ ReAct 双实现 + AutonomyGate 四规则 |
 | 05 | [multiagent-autogoal.md](05-multiagent-autogoal.md) | DAG-of-Agents + 共享黑板 + 持久化恢复 + 分布式 Scheduler + Steering |
 | 06 | [gateway-context-llm.md](06-gateway-context-llm.md) | HTTP Gateway(三级认证+租户隔离)+ UnifiedContext + LLM Provider |
+| 07 | [subagent-identity-harness.md](07-subagent-identity-harness.md) | 子 Agent 身份隔离:AgentNodeSpec Harness + ServiceRegistry + agentctx + 沙箱双路径 |
 
 ## 被纠正的关键错误
 
