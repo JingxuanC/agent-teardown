@@ -1,0 +1,248 @@
+% From Sessions to Lifetimes: Infrastructure Gaps for Long-Running AI Agents
+% NeurIPS 2026 Workshop on LLM Agents — Position Paper
+% Anonymous Submission
+
+\documentclass{article}
+\usepackage[final]{neurips_2026}  % Use 'review' for line numbers
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+\title{From Sessions to Lifetimes: Infrastructure Gaps for Long-Running AI Agents}
+
+\author{
+  Anonymous Authors\\
+  Paper under double-blind review\\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Current LLM-based agent frameworks are designed for sessions lasting minutes to hours. As model capabilities approach general-purpose thresholds, the next frontier is \textbf{continuous autonomous operation} at the scale of days to months. Through systematic source-code analysis of two production frameworks (kimi-code: ${\sim}$100K lines TypeScript; Grok Build: ${\sim}$1.34M lines Rust), we identify \textbf{five failure modes} that emerge when current architectures operate beyond their design timescale: cumulative compaction degradation, resilience cost escalation, unbounded state log growth, identity drift, and slow-timescale behavioral loops. These failures are infrastructure-level, not model-level. We propose five capabilities required to bridge the gap: multi-scale memory hierarchies, offline consolidation cycles, self-evolving prompts, adaptive verification, and cost-aware resource management, accompanied by a phased engineering roadmap. While our analysis is grounded in coding-agent frameworks, the failure modes and proposed solutions are expected to generalize to other agent domains.
+\end{abstract}
+
+\section{Introduction}
+
+The gap between ``an LLM that answers questions'' and ``an agent that works autonomously'' is measured not in model parameters but in \textbf{session length}. An agent that completes a coding task in 30 minutes and an agent that runs for 30 days face fundamentally different challenges, even with the same underlying model.
+
+Industry leaders have published extensively on agent design patterns, including prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer workflows~\cite{anthropic2024, openai2025agents, google2026patterns}. However, these patterns address \textbf{task-level} orchestration: how to decompose and execute a single user request. They do not address \textbf{lifecycle-level} resilience: how an agent maintains coherent operation across hundreds of tasks, thousands of turns, and continuous context compression over extended periods.
+
+\textbf{The specific gap we address}: among the major open-source agent frameworks we analyzed, none provides mechanisms designed for continuous operation beyond the hour timescale. Current architectures assume session boundaries (explicit start, bounded duration, clean termination), and their resilience mechanisms are calibrated for this regime.
+
+We contribute:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Empirical analysis}: Systematic source-code teardown of two production agent frameworks, identifying the timescale limits of current resilience mechanisms (Section~\ref{sec:failure}).
+\item \textbf{Differentiation from prior research prototypes}: We distinguish our infrastructure-level proposals from research-system concepts such as Generative Agents~\cite{park2023generative} and Reflexion~\cite{shinn2023reflexion} (Section~\ref{sec:related}).
+\item \textbf{Infrastructure roadmap}: Five capabilities required for continuous operation, with a phased development roadmap (Sections~\ref{sec:capabilities}--\ref{sec:roadmap}).
+\end{enumerate}
+
+\section{Background and Related Work}
+\label{sec:related}
+
+\paragraph{Agent frameworks.}
+We analyze two open-source agent frameworks. \textbf{kimi-code} (Moonshot AI): TypeScript, ${\sim}$100K lines, custom dependency-injection architecture with event-sourced persistence (wire.jsonl). \textbf{Grok Build} (SpaceXAI): Rust, ${\sim}$1.34M lines, 70+ crates, actor-based architecture with SQLite journaling. Both are terminal-based coding agents with full tool integration, goal management, subagent orchestration, and context compaction. While our analysis is limited to these two frameworks, the architectural patterns identified are shared across the broader agent ecosystem, including Claude Code, Cursor, and OpenAI Codex, based on their public documentation.
+
+\paragraph{Context management.}
+Context compaction (summarizing older conversation history to free token budget) is the primary resilience mechanism. Approaches include single-pass~\cite{kimicode} and two-pass summarization~\cite{grokbuild}, both relying on LLM self-summarization.
+
+\paragraph{Verification.}
+kimi-code trusts the model's self-report with a three-round blocked audit~\cite{kimicode_goal}. Grok Build uses an adversarial skeptic panel where multiple independent subagents vote via majority-refute~\cite{grokbuild_skeptic}.
+
+\paragraph{Long-running agent research and differentiation.}
+\textbf{Generative Agents}~\cite{park2023generative} implemented memory streams, reflection, and daily planning for simulated agents over multiple simulated days. Their architecture shares conceptual overlap with our proposed multi-scale memory hierarchy (Section~\ref{sec:memory}), but operated in a simulated environment with no real tool execution, no cost constraints, and no adversarial verification. Our proposal extends the concept to production infrastructure with cost-aware tiered consolidation and non-compactable identity layers.
+
+\textbf{Reflexion}~\cite{shinn2023reflexion} introduced verbal reinforcement learning, where agents maintain textual self-reflections to improve subsequent trials. Our proposed self-evolving prompts (Section~\ref{sec:prompts}) extend Reflexion from episodic task-level learning to system-level prompt evolution: modifying the agent's standing instructions, not just per-task memory.
+
+\textbf{Key distinction}: both are research prototypes demonstrating capability in controlled settings. Neither has been integrated into production agent infrastructure with real users, real costs, and real safety requirements.
+
+\section{Failure Modes at Extended Timescales}
+\label{sec:failure}
+
+\subsection{Scale Transformation}
+
+Table~\ref{tab:scale} shows the qualitative shift from session-scale to continuous operation.
+
+\begin{table}[h]
+\centering
+\caption{Scale transformation from session-level to continuous operation.}
+\label{tab:scale}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Dimension} & \textbf{Current (hours)} & \textbf{Continuous (days+)} \\
+\midrule
+Turns & ${\sim}$100 & ${\sim}$10,000+ \\
+Compaction events & 2--3 & ${\sim}$200--500 \\
+Goals completed & 1--5 & ${\sim}$100--1,000 \\
+Tokens consumed & ${\sim}$100K & ${\sim}10^{8}$+ \\
+State log size & ${\sim}$MB & ${\sim}$GB--TB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cumulative Compaction Degradation}
+
+After $k$ compaction events, the effective summary is a $k$-fold lossy compression:
+\begin{equation}
+S_k = f(f(\cdots f(H_0) \cdots))
+\end{equation}
+where $f$ is the summarization function and $H_0$ is the original history. We \textbf{hypothesize} that LLM summarization exhibits \textbf{semantic drift}: each pass may preserve different aspects, causing progressive loss of early context. This hypothesis is analytically motivated by information-theoretic properties of lossy compression chains but has not yet been empirically validated at scale. Validating it (e.g., measuring recall of early-session facts after 10, 50, and 200 compaction events) is an important direction for future work.
+
+\subsection{Resilience Cost Escalation}
+
+Table~\ref{tab:cost} provides illustrative monthly cost estimates (based on assumed workloads and 2025--2026 pricing).
+
+\begin{table}[h]
+\centering
+\caption{Illustrative monthly resilience costs at continuous-operation scale.}
+\label{tab:cost}
+\small
+\begin{tabular}{llcc}
+\toprule
+\textbf{Operation} & \textbf{Cost/invocation} & \textbf{Frequency} & \textbf{Monthly cost} \\
+\midrule
+Context compaction & \$0.01--0.05 & ${\sim}$20/day & \$6--300 \\
+Goal verification & \$0.05--0.20 & ${\sim}$10 goals/day & \$15--600 \\
+Continuation prompt & \$0.001 & every turn & ${\sim}$\$70 \\
+Goal planning & \$0.02--0.05 & ${\sim}$5/day & \$3--75 \\
+\midrule
+\textbf{Total} & & & \textbf{\$94--1,045} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Unbounded State Growth}
+
+Append-only logs grow to 300\,MB--1.5\,GB monthly. Recovery from full replay becomes infeasible at GB scale. Checkpoint mechanisms exist~\cite{grokbuild_sqlite} but lack automatic merging of old operations into snapshots.
+
+\subsection{Identity Drift}
+
+We define \textbf{identity persistence} operationally as a causally linked chain of key decisions and their rationales, maintained in a non-compactable store. Without such a mechanism, an agent that has undergone hundreds of compressions cannot be verified to be ``the same agent'' in the sense that its behavior is causally traceable to its original configuration. The persistence substrate must contain: (a) the original mission statement, (b) all decisions where the agent chose between alternatives with recorded rationale, and (c) all safety constraint invocations or modifications.
+
+\subsection{Slow-Timescale Behavioral Loops}
+
+Current doom-loop detectors~\cite{grokbuild_doomloop} operate on single inference streams (seconds). At continuous scale, slow-timescale loops emerge: repeated bug fix attempts across compactions, goals that consistently fail by narrow margins, or cycling between incomplete tasks. These require cross-session behavioral analysis.
+
+\section{Required Capabilities}
+\label{sec:capabilities}
+
+\subsection{Multi-Scale Memory Hierarchy}
+\label{sec:memory}
+
+Drawing on human memory models~\cite{atkinson1968human}, we propose a tiered architecture:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Tier} & \textbf{Timescale} & \textbf{Capacity} & \textbf{Consolidation} \\
+\midrule
+Working & seconds & ${\sim}$200K tokens & per-turn compaction \\
+Episodic & minutes--hours & ${\sim}$5K tokens & hourly extraction \\
+Daily & hours--day & ${\sim}$2K tokens & daily summary \\
+Weekly & days--week & ${\sim}$1K tokens & weekly review \\
+Identity & permanent & ${\sim}$200 tokens & never compacted \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This extends Generative Agents~\cite{park2023generative} by introducing tiered consolidation frequencies, a non-compactable identity layer, and cost-aware design.
+
+\subsection{Offline Consolidation}
+\label{sec:sleep}
+
+We propose a periodic offline batch processing cycle: an active phase (${\sim}$16h), a consolidation phase (${\sim}$4h: replay, extract, discard), and a deep maintenance phase (${\sim}$4h: log compaction, knowledge graph update, prompt optimization). The biological sleep analogy~\cite{diekelmann2010sleep} provides design inspiration, but the engineering justification stands independently: batch processing is more cost-effective than interleaving consolidation with active execution.
+
+\subsection{Self-Evolving Prompts}
+\label{sec:prompts}
+
+We propose a prompt evolution layer adjusting behavioral instructions based on accumulated experience. This extends Reflexion~\cite{shinn2023reflexion} from episodic self-reflection to system-level behavioral evolution. Changes are subject to an immutable safety constitution and version-controlled for auditability.
+
+\subsection{Adaptive Verification}
+
+Risk-tiered verification: low-risk changes receive automated diff checks; medium-risk receive single-skeptic verification; high-risk trigger 3--5 skeptic panels; critical changes require full verification plus human approval.
+
+\subsection{Cost-Aware Resource Management}
+
+Budget tracking (daily/weekly/monthly), small-model delegation for verification, extractive summarization for routine compaction, verification caching by diff hash, and low-load scheduling for deep consolidation.
+
+\section{Roadmap}
+\label{sec:roadmap}
+
+\paragraph{Short-term.} (1)~Automatic log compaction. (2)~Structured compaction replacing free-form notes with schema-based extraction. (3)~Daily/weekly budgets. (4)~Verification caching by diff hash.
+
+\paragraph{Medium-term.} (5)~Multi-scale memory hierarchy. (6)~Consolidation mode. (7)~Knowledge graph extraction. (8)~Adaptive verification.
+
+\paragraph{Long-term.} (9)~Self-evolving prompts with safety constraints. (10)~Non-compactable identity persistence store. (11)~Cross-session behavioral loop detection. (12)~Tenfold resilience cost reduction.
+
+\section{Scope and Generalizability}
+
+Our analysis is grounded in coding-agent frameworks, but the five failure modes are expected to generalize: compaction degradation affects any finite-context agent; cost escalation scales with resilience operation count, not task type; state growth is a property of append-only logging; identity drift is a consequence of lossy compression; slow loops are behavioral properties of LLM-based systems. Domains where additional failure modes may emerge include embodied AI (physical safety), multi-agent systems (coordination breakdown), and web agents (session management across services).
+
+\section{Threats to Validity}
+
+\paragraph{External validity.} Source-code analysis covers two frameworks. Confirming failure modes in Claude Code, Cursor, or Devin requires further study.
+\paragraph{Cost estimates.} Based on 2025--2026 pricing and assumed workloads; illustrative, not measured.
+\paragraph{Speculative proposals.} The multi-scale memory hierarchy and consolidation cycle lack empirical validation in agent systems.
+\paragraph{Extrapolated failure modes.} Compaction degradation and slow-timescale loops are analytically motivated but not empirically observed in deployed systems.
+
+\section{Conclusion}
+
+The path to continuously operating AI agents is not blocked by model capability but by infrastructure gaps in context management, verification, state persistence, and cost control. Current frameworks remain session-scale artifacts. Extending them requires new mechanisms: multi-scale memory, offline consolidation, adaptive verification, and cost-aware resource management. We call on the community to treat agent longevity as a first-class research problem.
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{20}
+
+\bibitem[Anthropic(2024)]{anthropic2024}
+Anthropic. \emph{Building Effective Agents}. \url{https://www.anthropic.com/engineering/building-effective-agents}, 2024.
+
+\bibitem[OpenAI(2025)]{openai2025agents}
+OpenAI. \emph{Agents SDK Documentation}. \url{https://developers.openai.com/api/docs/guides/agents}, 2025.
+
+\bibitem[Google(2026)]{google2026patterns}
+Google. \emph{Choose a design pattern for your agentic AI system}. Google Cloud Architecture Center, 2026.
+
+\bibitem[kimi-code]{kimicode}
+kimi-code. \emph{Context Memory and Compaction}. Source: \texttt{packages/agent-core-v2/src/agent/contextMemory/}. \url{https://github.com/MoonshotAI/kimi-code}.
+
+\bibitem[Grok~Build]{grokbuild}
+Grok Build. \emph{Two-pass compaction}. Source: \texttt{xai-grok-shell/src/session/two\_pass.rs}. \url{https://github.com/xai-org/grok-build}.
+
+\bibitem[kimi-code]{kimicode_goal}
+kimi-code. \emph{Goal Mode state machine}. Source: \texttt{agent/goal/goalService.ts}. \url{https://github.com/MoonshotAI/kimi-code}.
+
+\bibitem[Grok~Build]{grokbuild_skeptic}
+Grok Build. \emph{Adversarial skeptic panel}. Source: \texttt{session/goal\_classifier.rs}. \url{https://github.com/xai-org/grok-build}.
+
+\bibitem[Park et~al.(2023)]{park2023generative}
+J.~S. Park et~al. \emph{Generative Agents: Interactive Simulacra of Human Behavior}. In \emph{UIST}, 2023.
+
+\bibitem[Shinn et~al.(2023)]{shinn2023reflexion}
+N.~Shinn et~al. \emph{Reflexion: Language Agents with Verbal Reinforcement Learning}. In \emph{NeurIPS}, 2023.
+
+\bibitem[Grok~Build]{grokbuild_sqlite}
+Grok Build. \emph{SQLite journal and checkpoint}. Source: \texttt{xai-sqlite-journal/}. \url{https://github.com/xai-org/grok-build}.
+
+\bibitem[Parfit(1984)]{parfit1984}
+D.~Parfit. \emph{Reasons and Persons}. Oxford University Press, 1984.
+
+\bibitem[Grok~Build]{grokbuild_doomloop}
+Grok Build. \emph{Doom loop detection}. Source: \texttt{xai-grok-sampler/src/doom\_loop.rs}. \url{https://github.com/xai-org/grok-build}.
+
+\bibitem[Atkinson \& Shiffrin(1968)]{atkinson1968human}
+R.~C. Atkinson and R.~M. Shiffrin. \emph{Human Memory: A Proposed System and its Control Processes}. In \emph{The Psychology of Learning and Motivation}, 1968.
+
+\bibitem[Diekelmann \& Born(2010)]{diekelmann2010sleep}
+S.~Diekelmann and J.~Born. \emph{The memory function of sleep}. \emph{Nature Reviews Neuroscience}, 11:114--126, 2010.
+
+\end{thebibliography}
+
+\end{document}
