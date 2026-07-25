@@ -13,6 +13,7 @@
 | [7×24 AGI 的反熵挑战](05-agi-7x24.md) | 前瞻:多尺度记忆 + 睡眠巩固 + 自演化 prompt | ✅ |
 | [未解之题 —— Agent 的七个盲区](06-open-questions.md) | 反思:想透了工程,哲学才刚开始 | ✅ |
 | [哲学深度探索 —— 从代码到意识](07-philosophy-deep-dive.md) | 七个盲区的回应:Nature 2026 + CMU ToM + Parfit + AgentOS | ✅ |
+| [自我反驳 —— 反熵增框架的五个致命缺陷](08-self-rebuttal.md) | 反驳:偷换概念/过度归类/修辞非论证/解释不了创造/不可证伪 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
 | Plan mode / 审批沙箱 | kimi-code、Claude Code、Cursor | ⏳ |
