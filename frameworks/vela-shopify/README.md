@@ -14,6 +14,8 @@
 | 05 | [multiagent-autogoal.md](05-multiagent-autogoal.md) | DAG-of-Agents + 共享黑板 + 持久化恢复 + 分布式 Scheduler + Steering |
 | 06 | [gateway-context-llm.md](06-gateway-context-llm.md) | HTTP Gateway(三级认证+租户隔离)+ UnifiedContext + LLM Provider |
 | 07 | [subagent-identity-harness.md](07-subagent-identity-harness.md) | 子 Agent 身份隔离:AgentNodeSpec Harness + ServiceRegistry + agentctx + 沙箱双路径 |
+| 08 | [goal-evals-rag.md](08-goal-evals-rag.md) | GoalRunner+Verifier(execute→verify→stall)+ evals 6维度评估 + RAG 本地引擎 |
+| 09 | [wakeup-synth-templates.md](09-wakeup-synth-templates.md) | Wakeup三合一触发 + 15+TaskTemplate + Synthesizer防AI-slop + ToolRegistry |
 
 ## 被纠正的关键错误
 
