@@ -1,12 +1,12 @@
 # Insights · Agent 的第二定律 —— 反熵增
 
-> 本篇是拆解 kimi-code(25 篇)+ grok-build(10 篇)后,对"agent 到底是什么"的**最终思考**。不是行业调研(那个在 §9),是我自己的洞察。
+> 本篇是拆解**六个 agent 框架**(kimi-code 25 篇 + grok-build 10 篇 + Pi + Codex 4 篇 + OpenAI Agents SDK + Google ADK,共 ~42 篇)后,对"agent 到底是什么"的**核心思考**。不是行业调研(那个在 §9),是我自己的洞察。
 >
-> 核心论点:**Agent 的本质是反熵增。所有工程努力都是在对抗系统的自然退化。**
+> 核心论点:**Agent 的本质是对抗运行时的不确定性增长。所有工程努力都是在对抗系统的自然退化。**
 
 ## 0. 起点:一个尴尬的事实
 
-拆完 35 篇文档后,我发现一个尴尬的事实:
+拆完 42 篇文档(六个框架)后,我发现一个尴尬的事实:
 
 **LLM + 工具 + 记忆 + 循环 = 人人都知道的东西**。GPT 一下就能出来。这不是"洞察",是"描述"。
 
@@ -124,7 +124,9 @@ Agent 的"能量"是什么?
 
 ## 4. 五种反熵策略
 
-从 35 篇拆解中,我抽象出**五种反熵策略**:
+从 42 篇拆解中,我抽象出**五种反熵策略**:
+
+> **更新(2026-07-25)**:这五种策略已在**六个框架**(kimi-code / grok-build / Pi / Codex / OpenAI Agents SDK / Google ADK)中得到验证,跨三种语言(TS / Rust / Python)、两种形态(CLI / 库 SDK)、四个国家的设计团队。虽然仍不可说"穷尽"(参见 [08 自我反驳](08-self-rebuttal.md)),但六个独立实现的收敛提供了强证据。
 
 ### ① 压缩(Compress)
 
@@ -235,12 +237,16 @@ Agent 的熵增**极快**:
 
 ## 8. 最终定义
 
-> **Agent 是一个在不可逆的熵增中,通过持续的能量投入(压缩、隔离、验证、恢复、约束),维持秩序和目标导向性的系统。**
+> **修正版**(吸收 [08 自我反驳](08-self-rebuttal.md) 后):
+>
+> **Agent 是一个通过持续的信息处理(压缩、隔离、验证、恢复、约束)来对抗运行时的不确定性增长,同时生成有价值输出的系统。**
+>
+> ~~Agent 是一个在不可逆的熵增中,通过持续的能量投入,维持秩序和目标导向性的系统。~~ ← 修正前的版本,存在热力学熵/信息熵偷换问题(见 [08](08-self-rebuttal.md))。
 
 不是"LLM + 工具 + 记忆"(那只描述了结构)。
 不是"自主决策"(那只描述了行为)。
 
-**Agent 的本质是反熵增** —— 和生命体、建筑物、社会组织一样,存在的意义就是对抗自然的混乱趋势。
+**Agent 的本质是对抗不确定性增长** —— 需要持续维护才能保持有效,和任何复杂系统一样。但维护只是**一半**;另一半是**生成有价值的输出**(代码、分析、决策)。反熵(维护) + 生成(创造) = 完整的 agent 定义。
 
 之前定义的五个特征(自主性/反馈环/持久性/约束/可组合性)**都是反熵的手段**:
 
@@ -252,7 +258,7 @@ Agent 的熵增**极快**:
 | 约束(Constraint) | 约束(直接限制行为) |
 | 可组合性(Composability) | 隔离(分而治之,防交叉污染) |
 
-五个特征不是并列的,是**从属于"反熵增"这一根本目标的具体手段**。
+五个特征不是并列的,是**从属于"反熵"这一根本目标的具体手段**。
 
 ---
 
@@ -316,6 +322,17 @@ grok-build(10 篇):
 - [05-sampler.md](../frameworks/grok-build/05-sampler.md) —— Circuit breaker(反错误熵)
 - [07-goal-complete.md](../frameworks/grok-build/07-goal-complete.md) —— Goal 6 子系统(反行为熵)
 - [08-compaction-two-pass.md](../frameworks/grok-build/08-compaction-two-pass.md) —— 两遍压缩(反上下文熵)
+
+codex(4 篇):
+- [02-dual-stage-memory.md](../frameworks/codex/02-dual-stage-memory.md) —— 双阶段记忆(反上下文熵 + 反状态熵)
+- [03-multi-agent-execpolicy.md](../frameworks/codex/03-multi-agent-execpolicy.md) —— ExecPolicy DSL + agent graph(反错误熵 + 隔离)
+- [04-compaction.md](../frameworks/codex/04-compaction.md) —— 服务端压缩 + window 追踪(反上下文熵)
+
+Pi(1 篇):
+- [01-architecture.md](../frameworks/pi/01-architecture.md) —— Session Tree + branch summarization(反状态熵 + 恢复)
+
+OpenAI Agents SDK + Google ADK(1 篇):
+- [01-comparison.md](../frameworks/openai-agents-adk/01-comparison.md) —— 六框架反熵策略全覆盖(验证)
 
 ---
 

@@ -266,23 +266,37 @@ flowchart TB
 
 **Agent 不是"更聪明的 LLM",是"给 LLM 加了一套让它可信赖的工程系统"**。
 
-## 8. 给 kimi-code 的定位
+## 8. 六框架定位光谱
 
-基于行业全景,kimi-code 的定位:
+> **2026-07-25 更新**:从 kimi-code 单框架定位扩展为六框架全景。
 
-| 维度 | kimi-code 的选择 | 行业主流 |
+基于拆解的六个框架,agent 设计的**信任度光谱**:
+
+```
+Pi(最信任)    OpenAI Agents SDK    kimi-code      Codex          Google ADK    grok-build(最不信任)
+    │               │                   │              │               │              │
+ 无权限          Guardrail           19 policy     ExecPolicy     图结构        permission
+ 无验证          Sandbox             3轮审计       无 skeptic     Evaluation    +sandbox
+ 无拓扑          Handoff             扁平 swarm    树形+通信      Sub-agent树   +skeptic panel
+ 无记忆          Session             wire.jsonl    双阶段记忆     Memory        +doom loop
+ 无身份          Tracing             无            ed25519+JWT    A2A           +circuit breaker
+ 无云            无                  无            cloud-tasks    Cloud Run     无
+    │               │                   │              │               │              │
+ 最灵活          最小抽象            最平衡         结构性约束      企业级全栈    最安全
+```
+
+**六框架的独特贡献**:
+
+| 框架 | 独有设计 | 在光谱上的位置 |
 |---|---|---|
-| **自主性光谱** | 全覆盖(plan=workflow 到 goal=agent) | 各家都在光谱上选位置 |
-| **反馈环质量** | 极致优化(流式、错误归一、子 agent 隔离) | 共识 |
-| **持久性** | **最强调**(wire log、goal 状态机、cron) | 较少讨论 |
-| **约束** | **最重**(19 policy 权限链、四状态机) | Anthropic 接近 |
-| **可组合性** | swarm(并行) + MCP + ACP | 朝 A2A 发展 |
-| **自我反思** | ❌ 缺失 | 智谱/Anthropic 在探索 |
-| **跨 Agent 互操作** | ❌ 缺失(A2A 未实现) | Google 在推动 |
+| **kimi-code** | wire/Op 事件溯源 + 七层 harness + 双轨道 eval | 平衡(DI 深度) |
+| **grok-build** | doom loop 检测 + skeptic panel + circuit breaker + 两遍压缩 | 最不信任 |
+| **Pi** | Session Tree + branch summarization + 8+ provider | 最信任 |
+| **Codex** | 云任务 + agent identity + 双阶段记忆 + 4 平台沙箱 + ExecPolicy DSL | 结构性约束 |
+| **Agents SDK** | Handoff(控制权交接)+ Guardrail(并行中止)+ Tracing | 最小抽象 |
+| **Google ADK** | A2A 原生 + Memory + Evaluation + Web UI | 企业级全栈 |
 
-**kimi-code 的独特优势**:**持久性 + 约束**做得最深。这反映了 Moonshot 的工程文化 —— 他们认为"LLM 不可靠,所以工程约束比 LLM 能力更重要"。
-
-**kimi-code 的缺失**:**自我反思 + 跨 Agent 互操作**。这是未来需要补的方向。
+**六框架全部能归入五种反熵策略**(压缩/隔离/验证/恢复/约束),跨三种语言(TS/Rust/Python)、两种形态(CLI/库)、四个组织。详见 [04 反熵增](04-anti-entropy.md)。
 
 ## 9. 参考资料
 
