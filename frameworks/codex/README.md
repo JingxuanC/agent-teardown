@@ -12,6 +12,7 @@ OpenAI 官方的终端 coding agent。Rust 实现，100 个 crate，~116 万行�
 | 01 | [架构总览](01-architecture.md) | ✅ | 100 crate 分层 + 10 个独有设计 + 四框架对比 |
 | 02 | [双阶段记忆系统](02-dual-stage-memory.md) | ✅ | Stage1 提取 + Stage2 合并 + SQLite 作业队列 + 用量追踪 |
 | 03 | [Multi-Agent + ExecPolicy](03-multi-agent-execpolicy.md) | ✅ | 拓扑追踪 + agent 间通信 + fork + DSL 策略 + 网络协议级控制 |
+| 04 | [Compaction 系统](04-compaction.md) | ✅ | 服务端压缩 + AutoCompactWindow + token 预算感知 + trace |
 
 ## 关键发现速览
 
