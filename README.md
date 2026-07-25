@@ -24,6 +24,7 @@ insights/         # 跨框架对比与抽象出的设计模式
 | [pi](frameworks/pi/) | TypeScript | ✅ 1 篇 | Session Tree/branch summarization/最信任 LLM/8+ provider |
 | [codex](frameworks/codex/) | Rust | ✅ 4 篇 | 云任务/agent identity/双阶段记忆/4平台沙箱/execpolicy DSL |
 | [openai-agents-adk](frameworks/openai-agents-adk/) | Python | ✅ 1 篇 | Agents SDK(4原语) vs ADK(全栈+Memory+A2A) 六框架对比 |
+| [vela-shopify](frameworks/vela-shopify/) | Go | ✅ 1 篇 | DAG编排/记忆衰减+RRF/AutoGoal/K8s沙箱/唯一生产7×24 |
 
 未来可能加入:Claude Code、Cursor、Aider、OpenAI Codex、Devin、Goose 等。
 
