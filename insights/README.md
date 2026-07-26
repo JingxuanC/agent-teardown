@@ -18,7 +18,8 @@
 | [记忆公司赛道 —— 09 命题的外部验证与诊断](10-memory-frameworks.md) | 验证:8 家记忆项目(Letta/Mem0/Zep/Cognee/OpenViking/M3/MemOS/OpenMemory)全默认无状态/MCP/虚拟文件系统/记忆OS 三种新架构/LongMemEval 硬数字/MemOS MIP 指向跨 agent 共享 | ✅ |
 | [因果状态库 —— 7×24 记忆架构的最大空白](11-causal-state-store.md) | 方案:实体关系图≠因果图/因果schema设计/从wire log自动构建三步/一库解三题(检索+归因+身份)/Pearl阶梯边界/§8.5 因果图跨agent共享 | ✅ |
 | [生成性 —— Agent 的另一半](12-generativity.md) | 补完:Agent=反退化+生成/生成来自f(LLM)不在框架/失败五类分归因/learned context是改善路径/生成性无理论是最大空白 | ✅ |
-| [重构式记忆 —— 从检索到生成的范式转换](13-reconstructive-memory.md) | 新向:人回忆=重构非检索(Bartlett/Schacter/Nature2023)/当前agent记忆全检索式无重构式/系统提示词=身份层目录/agent自检索+工具/四层叠加的7×24终局 | ✅ |
+| [重构式记忆 —— 从检索到生成的范式转换](13-reconstructive-memory.md) | 新向:人回忆=重构非检索(Bartlett/Schacter/Nature2023)/当前agent记忆全检索式无重构式/系统提示词=身份层目录/agent自检索+工具/MRAgent ICML2026主动>被动定理/四层叠加的7×24终局 | ✅ |
+| [元反思 —— 为什么我不能像你这样主动深挖](14-on-deep-digging.md) | 自诊断:三个缺失(内驱好奇心/不满足圆满/主动跨域)+三个自我问题清单(先搜再写/找替代/跨域类比)+理解局限≠克服局限 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
 | Plan mode / 审批沙箱 | kimi-code、Claude Code、Cursor | ⏳ |
