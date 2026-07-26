@@ -16,6 +16,17 @@
 - Wang, L. et al. (2024) · *A Survey on Large Language Model based Autonomous Agents* · arXiv:2308.11432 · [link](https://arxiv.org/abs/2308.11432)
 - Zhang, X. & Zhang, Y. (2025) · *Planet as a Brain: Towards Internet of AgentSites based on AIOS Server* · arXiv:2504.14411 · [link](https://arxiv.org/abs/2504.14411)
 - Hu, X. et al. (2025) · *OS Agents: A Survey on MLLM-based Agents for General Computing Devices Use* · arXiv:2508.04482 · [link](https://arxiv.org/abs/2508.04482)
+- Liu, N.F. et al. (2023) · *Lost in the Middle: How Language Models Use Long Contexts* · TACL · [link](https://arxiv.org/abs/2307.03172)
+- Packer, C. et al. (2023) · *MemGPT: Towards LLMs as Operating Systems* · arXiv:2310.08560 · [link](https://arxiv.org/abs/2310.08560)
+- Lin, J. et al. (2025) · *Sleep-time Compute: Beyond Inference Scaling at Test-time* · arXiv:2504.13171 · [link](https://arxiv.org/abs/2504.13171)
+- Wu, W. et al. (2024) · *LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory* · arXiv:2410.10813 · [link](https://arxiv.org/abs/2410.10813)
+- Maharana, A. et al. (2024) · *LOCOMO: Long Context Multi-Turn Conversational Memory* · arXiv:2402.17753 · [link](https://arxiv.org/abs/2402.17753)
+- Pearl, J. & Mackenzie, D. (2018) · *The Book of Why: The New Science of Cause and Effect* · Basic Books
+- Pearl, J. (2009) · *Causality: Models, Reasoning, and Inference* (2nd ed.) · Cambridge University Press
+- REMI (2025) · *A Novel Causal Schema Memory Architecture* · arXiv:2509.06269 · [link](https://arxiv.org/abs/2509.06269)
+- Chen, T.Y. (2025) · *Dynamic Causal-Graph Memory: Structured Retrieval for Million-Token Reasoning* · OpenReview · [link](https://openreview.net/forum?id=0Us7om0vhZ)
+- Mohamed, A. et al. (2025) · *LLM as a Broken Telephone: Iterative Generation Distorts Information* · ACL 2025 · [link](https://aclanthology.org/2025.acl-long.371/)
+- Bjlkeng (2024) · *Iterative Summarization using LLMs* · Blog · [link](https://bjlkeng.io/posts/iterative-summarization-using-llms/)
 
 ### 官方文档 / 技术博客
 - Anthropic · *Building Effective Agents* · Anthropic Engineering Blog (Dec 2024) · [link](https://www.anthropic.com/engineering/building-effective-agents)
