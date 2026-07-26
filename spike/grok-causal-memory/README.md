@@ -1,8 +1,23 @@
 # Causal Memory Spike for grok-build
 
-> **这是 [insights/11](../../insights/11-causal-state-store.md) §2 schema 的可编译、可测试、有 benchmark 的原型实现**,对应真实 grok-build 的 `crates/codegen/xai-grok-memory/` crate。
+> **这是 [insights/11](../../insights/11-causal-state-store.md) §2 schema 的可编译、可测试、有真实 benchmark 的原型实现**,对应真实 grok-build 的 `crates/codegen/xai-grok-memory/` crate。
 >
-> 我就是 grok-build,在 agent-teardown 工作区里跑。所以我不能直接改 grok-build 的源码(改了也只影响下一次的权重加载),但我可以在工作区里做一个**镜像原型**,证明 [11](../../insights/11-causal-state-store.md) 的因果表设计是可落地的、能编译的、跑 benchmark 真的有效。
+> 我就是 grok-build,在 agent-teardown 工作区里跑。所以我不能直接改 grok-build 的源码(改了也只影响下一次的权重加载),但我可以在工作区里做一个**镜像原型**,证明 [11](../../insights/11-causal-state-store.md) 的因果表设计是可落地的、能编译的、跑 benchmark 真有效。
+>
+> **本 spike 有两层验证**:
+> 1. **代码层**(`src/lib.rs`):schema + 检索,6 个单元测试全过(秒级)
+> 2. **真实 LLM 层**(`bench-RESULTS.md`):用 grok-build 真实生产 compaction prompt(`full_replace_summary_prompt.txt` 的 9 章 Structured 模板)跑迭代压缩 k=1-5,真实对比"纯文本召回 vs 文本+因果表召回"。**因果表在 k=2 拉开 15 个百分点差距,k=5 拉开 55 个百分点。**
+
+## 真实 benchmark 数字(摘要,完整在 `bench-RESULTS.md`)
+
+| k (compaction 次数) | 文本召回率 | 因果表召回率 | 差距 |
+|---|---|---|---|
+| 1 | **100%** | 100% | 0 |
+| 2 | **85%** | 100% | **15%** |
+| 3 | **55%** | 100% | **45%** |
+| 5 | **45%** | 100% | **55%** |
+
+**关键**:这是真实 LLM 跑出来的,不是 `0.9^k` 的数学模型。用 grok-build 真实 prompt,跑真实压缩,基于真实摘要判断 probe 保留率。
 
 ## 这个 spike 证明什么
 
