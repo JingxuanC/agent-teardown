@@ -27,6 +27,8 @@
 - Chen, T.Y. (2025) · *Dynamic Causal-Graph Memory: Structured Retrieval for Million-Token Reasoning* · OpenReview · [link](https://openreview.net/forum?id=0Us7om0vhZ)
 - Mohamed, A. et al. (2025) · *LLM as a Broken Telephone: Iterative Generation Distorts Information* · ACL 2025 · [link](https://aclanthology.org/2025.acl-long.371/)
 - Bjlkeng (2024) · *Iterative Summarization using LLMs* · Blog · [link](https://bjlkeng.io/posts/iterative-summarization-using-llms/)
+- ByteDance Volcengine (2026) · *OpenViking: The Context Database for AI Agents* · GitHub · [link](https://github.com/volcengine/OpenViking)
+- Li, Z. et al. (2025) · *MemOS: A Memory OS for AI System* · arXiv:2507.03724 · [link](https://arxiv.org/abs/2507.03724)
 
 ### 官方文档 / 技术博客
 - Anthropic · *Building Effective Agents* · Anthropic Engineering Blog (Dec 2024) · [link](https://www.anthropic.com/engineering/building-effective-agents)

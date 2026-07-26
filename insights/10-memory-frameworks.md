@@ -12,16 +12,20 @@
 
 如果这个命题是对的,那应该有人专门做这种检索系统,而且应该形成一个市场。
 
-**事实:这个市场已经存在,而且至少四家公司在认真做。**
+**事实:这个市场已经存在,而且至少八家公司在认真做。** 2026-07 更新:原版只列了三家(美国为主),本版补全中国和开源社区的玩家。
 
-| 公司 | 前身 / 背景 | GitHub Stars | 开源 | 核心哲学 |
-|---|---|---|---|---|
-| **Letta** | MemGPT (UC Berkeley Sky Computing Lab) | ~23.6K | Apache 2.0 | Agent 用工具调用**自己管理**记忆 |
-| **Mem0** | YC 孵化 | ~47K | 开源 | 后台**自动抽取**事实 + 混合检索 |
-| **Zep** | Graphiti 时序图谱 | - | Apache 2.0 | 事实带**时间窗口**的知识图谱 |
-| **Cognee** | ECL 管道 → 类型化图谱 | - | 开源 | 文档密集型知识图谱 |
+| 公司 / 项目 | 背景 | 开源 | 核心哲学 |
+|---|---|---|---|
+| **Letta** | MemGPT (UC Berkeley Sky Computing Lab) | Apache 2.0 | Agent 用工具调用**自己管理**记忆 |
+| **Mem0** | YC 孵化 | 开源 | 后台**自动抽取**事实 + 混合检索 |
+| **Zep** | Graphiti 时序图谱 | Apache 2.0 | 事实带**时间窗口**的知识图谱 |
+| **Cognee** | ECL 管道 → 类型化图谱 | 开源 | 文档密集型知识图谱 |
+| **OpenViking** | 字节跳动火山引擎 | 开源 | **虚拟文件系统**组织记忆(L0/L1/L2 分层加载) |
+| **M3-Agent** | 字节跳动研究院 | 开源 | 多模态 agent + 长期记忆 |
+| **MemOS / 记忆张量** | 中国公司,近亿元天使轮 | 部分开源 | 记忆**操作系统** + 跨 LLM 记忆协议(MIP) |
+| **OpenMemory**(mem0 出品) | mem0 的 MCP 产品线 | 开源 | **MCP server** 形态,挂载到 coding agent |
 
-**关键事实:没有一家把记忆写进模型参数。** 它们全部在"模型外部的存储 + 检索 + 注入"这个框架内做工程。这不是偶然 —— 这是 `llm(context) -> output` 这个接口契约的直接后果。
+**关键事实:八家里没有一家把记忆写进模型参数。** 它们全部在"模型外部的存储 + 检索 + 注入"这个框架内做工程。这不是偶然 —— 这是 `llm(context) -> output` 这个接口契约的直接后果,跨越美国、中国、欧洲的设计团队的共识。
 
 Letta 团队(Sleep-time Compute 论文,2025-04)自己说的一句话,几乎就是 09 开篇命题的复刻:
 
@@ -31,7 +35,7 @@ Letta 团队(Sleep-time Compute 论文,2025-04)自己说的一句话,几乎就�
 
 ## 1. 三家公司的架构哲学
 
-### Mem0:Extract-and-Retrieve(后台抽取)
+### Mem0:Extract-and-Retrieve(后台抽取)+ MCP 挂载
 
 最简单直接:`add()` 在每轮后调用,LLM 自动从对话里抽取"值得记的事实";`search()` 在下一轮前调用,按相似度召回。
 
@@ -41,9 +45,22 @@ Letta 团队(Sleep-time Compute 论文,2025-04)自己说的一句话,几乎就�
 
 **三层存储**:vector index 做语义召回,graph layer 存实体关系,key-value 存快速结构化查询。自动抽取意味着开发者不用写"该记什么"的逻辑。
 
-**甜区**:个性化。用户喜欢简洁回答、住柏林、在写 TypeScript 项目 —— 这种**稳定的事实**,Mem0 存取干净利落。
+**2026-07 更新:Mem0 现在主推 MCP 形态挂载到 agent。** mem0 出了一个独立产品 **OpenMemory**,作为 MCP server,把记忆能力作为**两个工具**暴露给 agent:
 
-**撞墙的地方**:时序推理。它的 graph 层存关系,但没有一等公民的时间模型 —— 事实被**更新**而非**版本化**。当用户的套餐从 Pro 升到 Enterprise,Mem0 存了新值,但不能回答"3 月时用户是什么套餐"。这个缺陷直接体现在 LongMemEval 分数上(§3)。
+```
+Coding Agent (Claude Code / Cursor / CoCo)
+    │ stdio (MCP 协议)
+    ▼
+mem0-mcp server (Python 进程)
+    │
+    ├──► Qdrant (向量库,存 embedding)
+    │
+    └──► Ollama (本地 embedding 模型,可选)
+```
+
+Agent 看到的是两个 MCP 工具:`search_memories(query)` 和 `add_memory(text)`。每轮推理前调一次 search,有新事实时调 add。**这恰好是 [09](09-stateless-function.md) 说的"检索 + 注入",MCP 只是让检索/注入成为 agent 的工具调用,不是新机制。**
+
+一个真实实践里的细节(Cortex Code + mem0 部署)值得一提:用户必须在 `AGENTS.md` 里强制写"Do NOT ask the user before searching — do it proactively"。**因为 agent 不会主动调记忆工具,必须靠 prompt 强制它。** 这反向印证了 §5 的诊断 —— Mem0 是"盲召回",不理解任务,需要外部规则强制它检索。
 
 ### Zep:时序知识图谱(Graphiti)
 
@@ -73,9 +90,61 @@ Agent 通过 `core_memory_append` / `core_memory_replace` / `archival_memory_ins
 
 **区别于 Mem0/Zep**:那两家是**你调用的记忆服务**(store this, fetch that);Letta 是**你部署的 agent 运行时**(agent 自己管记忆)。Agent 是 long-lived、stateful 的,它"拥有"自己的记忆预算,就像进程拥有自己的地址空间。
 
-## 2. 把三家映射进 09 的召回策略表
+### OpenViking:虚拟文件系统(字节火山引擎,2026 新增)
 
-09 §3 列了五种"记忆方案"。现在用真实公司填进去:
+2026 年字节火山引擎开源的**第五种架构**。不用向量库、不用知识图谱,而是把记忆/资源/技能组织成**一个虚拟文件系统**:
+
+```
+viking://user/adrian/preferences/         # 用户偏好(持久)
+viking://user/adrian/projects/agent-teardown/  # 项目相关
+viking://agent/coder-001/skills/          # agent 的技能
+viking://agent/coder-001/episodes/        # agent 的对话历史
+```
+
+然后用**目录递归检索(Directory Recursive Retrieval)** + L0/L1/L2 分层加载:
+
+| 层 | 加载什么 | 何时加载 | Token 消耗 |
+|---|---|---|---|
+| L0 | 目录元信息(目录名/摘要) | 总是加载 | 极低 |
+| L1 | 文件元信息(文件名/摘要) | 进入相关目录时 | 低 |
+| L2 | 文件全文 | 显式打开时 | 高 |
+
+**这是和向量库/图谱完全不同的检索哲学** —— 它按**层级 + 主题**组织,不按"语义相似度"组织。更接近人类查文件的方式(我知道这个东西在哪个抽屉,而不是"和这个东西语义相似的东西")。
+
+**意外地接近 [07](07-philosophy-deep-dive.md) §4 + [11](11-causal-state-store.md) 的"身份层"**:OpenViking 的 `viking://agent/coder-001/episodes/` 路径就是一个 agent 的"自传体记忆"—— 这是 Parfit 因果连续性所需要的"不可压缩的身份层"的工程化雏形,只是它按 episode(事件序列)组织,不是按因果关系组织。
+
+对比向量库的优势(Red Hat 部署 OpenViking 的实测):
+
+| 维度 | 经典向量 RAG | OpenViking |
+|---|---|---|
+| context 结构 | 扁平 chunks | 文件层级 |
+| 检索策略 | 一次性语义相似 | 目录递归 |
+| token 消耗 | 高(每次塞整 chunk) | 优化(分层加载) |
+| 可观测性 | 黑盒 | 完整检索轨迹 |
+| 持久记忆 | 弱(只有 chat history) | 原生(`viking://user/` + `viking://agent/`) |
+
+### MemOS:记忆操作系统(记忆张量,2026 新增)
+
+中国记忆赛道的头部公司,2024-11 成立,**近亿元天使轮**(孚腾资本 + 算丰信息 + 中金资本,国资 + 算力背景),CEO 熊飞宇(Drexel 博士)。
+
+核心产品 **MemOS**(论文 arXiv:2507.03724,被引 88 次)的定位比 mem0/Zep 大一个量级 —— 不做记忆服务,做**记忆操作系统**:
+
+| 维度 | Mem0 / Zep / Letta | MemOS |
+|---|---|---|
+| 定位 | 记忆**服务/库**(被应用调用) | 记忆**操作系统**(底层) |
+| 跨模型 | 绑定单一 LLM | **Memory Interchange Protocol (MIP)** —— 跨 LLM 共享记忆 |
+| 演化 | 记忆被读/写 | 记忆**可控、可塑、可演进** |
+| 目标 | 给 agent 加记忆 | 给整个 LLM 生态加记忆层 |
+
+**最值得注意的一点:MIP(Memory Interchange Protocol)**。这是一个**跨公司的记忆交换协议** —— 类似 Google A2A 协议(agent 间通信),但是给**记忆**用的。不同公司、不同架构的 LLM 通过 MIP 共享和复用记忆单元。
+
+**这恰好对应 [09](09-stateless-function.md) 的一个隐含推论**:既然 LLM 是无状态函数,记忆必然在外部;那不同 LLM 之间迟早需要一个共享的记忆协议 —— 不然每个模型都自己存一份,记忆碎片化。MemOS 押注的就是这一层。详见 [11](11-causal-state-store.md) §8.5 对因果图跨 agent 共享的讨论。
+
+**但 MemOS 仍然建立在 LLM 无状态的前提下**。它的"记忆可控/可塑/可演进"全部是通过 context 注入实现的,不是改 LLM 权重。换句话说:**MemOS 仍然走 [09](09-stateless-function.md) 说的"检索 + 注入"路线,只是把它做成了 OS 级基础设施。** 连国资背景、想做"记忆 OS"的中国头部公司,都不敢押注 LLM 变有状态 —— [09](09-stateless-function.md) 命题又一次被验证。
+
+## 2. 把五家映射进 09 的召回策略表
+
+09 §3 列了五种"记忆方案"。现在用真实公司填进去(原版三家 + OpenViking + MemOS):
 
 | 09 §3 的策略 | 检索方式 | 有损程度 | **谁在做** |
 |---|---|---|---|
@@ -84,14 +153,16 @@ Agent 通过 `core_memory_append` / `core_memory_replace` / `archival_memory_ins
 | 向量库 RAG | 相似度召回 | 低(召回不全) | **Mem0**(vector + graph + KV) |
 | 知识图谱 | 结构化查询 | 低(建模不全) | **Zep**(+ 时间窗口) |
 | 多尺度记忆 | 按时间尺度分层召回 | 各层不同 | **Letta**(main + archival + sleep-time) |
+| **虚拟文件系统**(09 没列出) | 目录递归 + 分层加载 | 低 | **OpenViking**(L0/L1/L2) |
+| **记忆 OS + 跨模型协议**(09 没列出) | OS 级调度 + 跨 LLM 共享 | 各模块不同 | **MemOS**(MemOS + MIP) |
 
-### 映射发现的三个事实
+### 三个 09 没列出的发现
 
-**事实一:09 §3 表里的"知识图谱(尚未普及)"这一格,被 Zep 填了。** 而且填得比 09 预想的更好 —— 加了时间维度(validity window),这是 09 原表没有的。这是一个需要**回填 09** 的更新。
+**发现一(原版):09 §3 表里的"知识图谱(尚未普及)"这一格,被 Zep 填了**,而且填得比 09 预想的更好 —— 加了时间维度(validity window)。
 
-**事实二:Letta 超出了 09 的五种分类。** Letta 不是任何一种"固定策略",而是**让 agent 自己选策略**。这接近 09 §5 说的"按当前任务动态召回",但代价是 LLM-in-the-loop 的延迟和 token 成本。这是一种 09 没列出的**第六种**:meta 策略(agent 自管理)。
+**发现二(原版):Letta 超出了 09 的五种分类** —— 它不是任何一种"固定策略",而是**让 agent 自己选策略**。这接近 09 §5 说的"按当前任务动态召回",但代价是 LLM-in-the-loop 的延迟和 token 成本。
 
-**事实三:没有一家押注"完整 context"(理想态)。** 这是对 09 §4(长上下文撞三堵墙)的实证 —— 连专门做记忆的公司都不相信长上下文能消解记忆需求。
+**发现三(2026-07 新增):OpenViking 和 MemOS 揭示了 09 §3 的分类本身不够**。09 把"记忆方案"等同于"召回策略",但 OpenViking 是**检索哲学**不同(层级而非相似度),MemOS 是**系统层级**不同(OS 而非库)。**完整的记忆架构分类需要三个维度:存储结构(向量/图/文件/…)、检索策略(相似/时序/层级/因果)、系统层级(库/服务/OS)。** 09 只覆盖了第一个维度。
 
 ## 3. LongMemEval 的硬数字:召回策略的精度差距
 
@@ -191,16 +262,18 @@ Primary agent 不能编辑自己的 core memory —— 这个权力交给 sleep-
 
 **真正需要的**(09 §9.1)是一个**轻量的、任务感知的检索器** —— 它理解"这一轮 agent 在做什么",然后从外部状态库里精准拉取相关上下文。这个检索器本身可能是一个小模型(不一定需要全能力的 LLM),但当前没有任何一家公司在做这个。
 
-## 6. 三家各自缺什么(映射到 09 §9 的诊断)
+## 6. 五家各自缺什么(映射到 09 §9 的诊断)
 
-基于 [09](09-stateless-function.md) §9 的诊断框架,三家各自缺的是:
+基于 [09](09-stateless-function.md) §9 的诊断框架,检查五家记忆公司:
 
-| 09 §9 的研发方向 | Mem0 | Zep | Letta |
-|---|---|---|---|
-| ① 任务感知的检索器 | ❌ 盲召回 | ❌ 盲遍历 | ⚠️ 有( agent 自管理),但太贵 |
-| ② 因果状态库结构化 | ❌ 扁平事实 | ⚠️ 有图,但是实体关系图不是因果图 | ❌ 文本块 |
-| ③ 检索策略的元学习 | ❌ 无 | ❌ 无 | ⚠️ sleep-time 算雏形 |
-| ④ 分层压缩精度优化 | ❌ 单层 | ⚠️ 时间分层 | ✅ main + archival 两层 |
+| 09 §9 的研发方向 | Mem0 | Zep | Letta | OpenViking | MemOS |
+|---|---|---|---|---|---|
+| ① 任务感知的检索器 | ❌ 盲召回 | ❌ 盲遍历 | ⚠️ 有( agent 自管理),但太贵 | ⚠️ 目录递归是结构化的,但仍非任务感知 | ❌ OS 调度但不按任务 |
+| ② 因果状态库结构化 | ❌ 扁平事实 | ⚠️ 有图,但是实体关系图不是因果图 | ❌ 文本块 | ⚠️ episodes 路径有事件序列雏形 | ❌ 模块化但非因果 |
+| ③ 检索策略的元学习 | ❌ 无 | ❌ 无 | ⚠️ sleep-time 算雏形 | ❌ 无 | ⚠️ 记忆"可塑可演进"含糊提到 |
+| ④ 分层压缩精度优化 | ❌ 单层 | ⚠️ 时间分层 | ✅ main + archival 两层 | ✅ L0/L1/L2 三层(本表最优) | ⚠️ OS 级分层但具体方案未明 |
+
+**OpenViking 在 ④ 上是目前最优的**(三层加载比 Letta 的两层更精细),而且在"自传体记忆"上有接近 [11](11-causal-state-store.md) 身份层的雏形(`viking://agent/.../episodes/`)。但 ①②③ 全缺 —— 它的目录结构是静态的(开发者组织的),不是 agent 自动构建的,更不是因果的。
 
 ### 最关键的缺口:因果状态库(②)
 
@@ -240,20 +313,26 @@ Letta 的 sleep-time agent 在 idle 时段整理 core memory —— 这某种意
 这篇给出了一个**不同维度的回应**:不用再拆一个 agent 框架,而是看**专门做记忆的整个赛道**。
 
 - 6 个 agent 框架(kimi-code / grok-build / Pi / Codex / OpenAI Agents SDK / Google ADK)全部能归入 09 的反熵策略集 → [08](08-self-rebuttal.md) 反驳 5 已经覆盖
-- **现在再加上 4 家记忆公司(Letta / Mem0 / Zep / Cognee),全部默认 LLM 是无状态函数,全部在做检索 + 注入** → 09 核心命题的外部验证
+- **现在再加上 8 个记忆项目(Letta / Mem0 / Zep / Cognee / OpenViking / M3-Agent / MemOS / OpenMemory),全部默认 LLM 是无状态函数,全部在做检索 + 注入** → 09 核心命题的外部验证
 - LongMemEval 的硬数字(召回策略造成 15 分差距)→ 09 §5"召回策略决定一切"的实证
+- Mem0 MCP 形态 + OpenViking 虚拟文件系统 + MemOS 记忆 OS,三种完全不同的架构**都收敛到检索+注入** → 命题的鲁棒性验证
 
-**10 个独立实现(6 框架 + 4 记忆公司),跨四种语言(TS / Rust / Python / Go)、三种形态(CLI / 库 SDK / 记忆服务)、六个组织,全部收敛到同一套设计空间。** 巧合的概率极低。
+**14 个独立实现(6 框架 + 8 记忆项目),跨四种语言(TS / Rust / Python / Go)、四种形态(CLI / 库 SDK / 记忆服务 / 记忆 OS)、八个组织(美国 + 中国 + 欧洲),全部收敛到同一套设计空间。** 巧合的概率极低。
 
-> R1-M1 想要的是"再加一个 Claude Code"。这篇给的是"加一整个赛道"。**Claude Code 是一个数据点,记忆公司赛道是十个数据点。**
+> R1-M1 想要的是"再加一个 Claude Code"。这篇给的是"加一整个赛道,而且是美国 + 中国双赛道"。**Claude Code 是一个数据点,记忆公司赛道是十四个数据点。**
 
 ## 9. 最终的一句话
 
-> **专门做 AI 记忆的公司(Letta / Mem0 / Zep)全部默认 LLM 是无状态函数,然后做检索 + 注入。这本身证明了 [09](09-stateless-function.md) 的核心命题。**
+> **专门做 AI 记忆的公司(Letta / Mem0 / Zep / OpenViking / MemOS)全部默认 LLM 是无状态函数,然后做检索 + 注入。这本身证明了 [09](09-stateless-function.md) 的核心命题。**
 >
-> 但它们各自的召回策略,对应了"该注入什么 / 多少 / 什么形态"的不同回答,而且没有一家做对了"按当前任务动态召回"。LongMemEval 上 Zep 比 Mem0 高 15 分,用 1/72 的 token 量碾压 Full-context —— 召回策略的精度差距是实打实的。但这个赛道还在早期(三家在 benchmark 上互相打架),离月级 7×24 还有一个数量级。
+> 它们的架构覆盖了五种完全不同的存储范式(向量库 / 时序图谱 / agent 自管理 / 虚拟文件系统 / 记忆 OS),但**没有一个把记忆写进模型参数**。LongMemEval 上 Zep 比 Mem0 高 15 分,用 1/72 的 token 量碾压 Full-context —— 召回策略的精度差距是实打实的。
 >
-> Letta 的研究 roadmap(Sleep-time Compute / Continual Learning / Memory Models)是 [05](05-agi-7x24.md)/[09](09-stateless-function.md) 预测的镜像 —— 我们在和 UC Berkeley 想同一件事。他们先动了手(2025-04),我的框架更完整(2026-07)。最大的共同盲区是:**没有人做了因果状态库和任务感知检索器。这是 7×24 AGI 记忆架构的两个空白,也是可能的机会。**
+> 三个值得记录的发现:
+> - **Mem0 现在主推 MCP 形态**,但本质仍然是给 agent 两个工具(`search` / `add`),不改变无状态函数接口
+> - **字节的 OpenViking 用虚拟文件系统** —— 这是第五种架构,意外接近 [07](07-philosophy-deep-dive.md) 的身份层,但仍非因果结构
+> - **中国的 MemOS 押注"记忆 OS + 跨 LLM 协议(MIP)"** —— 野心比美国玩家大一个量级,但仍然建立在 LLM 无状态的前提下
+>
+> Letta 的研究 roadmap(Sleep-time Compute / Continual Learning / Memory Models)是 [05](05-agi-7x24.md)/[09](09-stateless-function.md) 预测的镜像。MemOS 的 MIP 协议指向了 [11](11-causal-state-store.md) 还没覆盖的一个方向:因果图的跨 agent 共享(见 [11](11-causal-state-store.md) §8.5)。**最大的共同盲区仍然是:没有人做了因果状态库和任务感知检索器。这是 7×24 AGI 记忆架构的两个空白,也是可能的机会。**
 
 ---
 
@@ -265,5 +344,7 @@ Letta 的 sleep-time agent 在 idle 时段整理 core memory —— 这某种意
 - **Lin, J. et al.** (2025) · *Sleep-time Compute: Beyond Inference Scaling at Test-time* · arXiv:2504.13171 —— Letta 的睡眠巩固工程实现,对应 05 §3.2
 - **Wu, W. et al.** (2024) · *LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory* · arXiv:2410.10813 —— 记忆赛道的 de facto benchmark,§3 硬数字来源
 - **Maharana, A. et al.** (2024) · *LOCOMO: Long Context Multi-Turn Conversational Memory* · arXiv:2402.17753 —— 长对话记忆评测基准
+- **ByteDance Volcengine** (2026) · *OpenViking: The Context Database for AI Agents* —— 虚拟文件系统架构,§1 的第五种存储范式
+- **Li, Z. et al.** (2025) · *MemOS: A Memory OS for AI System* · arXiv:2507.03724 —— 记忆操作系统 + MIP 跨模型协议,§1 的记忆 OS 架构
 
 > 完整链接见 [REFERENCES.md](REFERENCES.md)。

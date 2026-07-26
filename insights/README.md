@@ -15,8 +15,8 @@
 | [哲学深度探索 —— 从代码到意识](07-philosophy-deep-dive.md) | 七个盲区的回应:Nature 2026 + CMU ToM + Parfit + AgentOS | ✅ |
 | [自我反驳 —— 反熵增框架的五个致命缺陷](08-self-rebuttal.md) | 反驳:偷换概念/过度归类/修辞非论证/解释不了创造/不可证伪 | ✅ |
 | [LLM 是无状态函数 —— 7×24 AGI 的物理基础](09-stateless-function.md) | 重构:context 之外皆不存在/幻觉=组装失败/记忆=检索注入/AGI 最后一公里在检索架构 | ✅ |
-| [记忆公司赛道 —— 09 命题的外部验证与诊断](10-memory-frameworks.md) | 验证:Letta/Mem0/Zep 全默认无状态/LongMemEval 硬数字/Letta roadmap=05+09 镜像/无人做对任务感知检索 | ✅ |
-| [因果状态库 —— 7×24 记忆架构的最大空白](11-causal-state-store.md) | 方案:实体关系图≠因果图/因果schema设计/从wire log自动构建三步/一库解三题(检索+归因+身份)/Pearl阶梯边界 | ✅ |
+| [记忆公司赛道 —— 09 命题的外部验证与诊断](10-memory-frameworks.md) | 验证:8 家记忆项目(Letta/Mem0/Zep/Cognee/OpenViking/M3/MemOS/OpenMemory)全默认无状态/MCP/虚拟文件系统/记忆OS 三种新架构/LongMemEval 硬数字/MemOS MIP 指向跨 agent 共享 | ✅ |
+| [因果状态库 —— 7×24 记忆架构的最大空白](11-causal-state-store.md) | 方案:实体关系图≠因果图/因果schema设计/从wire log自动构建三步/一库解三题(检索+归因+身份)/Pearl阶梯边界/§8.5 因果图跨agent共享 | ✅ |
 | [生成性 —— Agent 的另一半](12-generativity.md) | 补完:Agent=反退化+生成/生成来自f(LLM)不在框架/失败五类分归因/learned context是改善路径/生成性无理论是最大空白 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
