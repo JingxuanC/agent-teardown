@@ -150,9 +150,43 @@ Agent 永远知道自己**有哪些**过去(目录常驻),只是不知道**细�
 
 > **agent 的记忆不该是"存原文 + 精确召回",而该是"存碎片 + 图式 + 让 LLM 重构"。**
 
-有一篇 2026 论文已经开始尝试:**arXiv:2606.06036 · *Memory is Reconstructed, Not Retrieved: Graph Memory for LLM Agents***。它的核心:用图存碎片,让 LLM 基于碎片 + schema 重构记忆,而不是召回原文。
+有一篇 2026 论文已经开始尝试 —— 而且不是普通的"萌芽":**arXiv:2606.06036 · *Memory is Reconstructed, Not Retrieved: Graph Memory for LLM Agents* · Shuo Ji, Yibo Li, Bryan Hooi · ICML 2026 接收**(不是非会议论文)。
 
-但**生产记忆公司没有采用这个方向** —— Mem0/Zep/Letta/OpenViking/MemOS 全部是检索式([10](10-memory-frameworks.md))。学术有萌芽,工业无人采用,框架无人系统化 —— 这和 [11](11-causal-state-store.md) 因果状态库的处境一模一样。
+### MRAgent 做了什么
+
+它的核心是 **Cue–Tag–Content 关联记忆图 + 主动重构机制**:
+
+```
+Cue(细粒度线索)— 通过 Tag(语义桥梁) — 连接到 Content(记忆内容)
+```
+
+关键创新:**主动重构(active reconstruction)** —— LLM 推理直接嵌入记忆访问过程,迭代地探索和剪枝检索路径,根据累积的证据动态调整。这和传统的 "retrieve-then-reason"(先检索再推理)的静态管线完全不同。
+
+### 这篇论文最重要的贡献是数学证明,不是实验
+
+附录 C 给了一个**理论分离结果**:
+
+| 命题 | 内容 |
+|---|---|
+| **C.4 主定理** | 主动检索(active retrieval)**严格强于**被动检索(passive retrieval) |
+| **C.6** | 在 Binary-Tree Needle-in-a-Haystack 任务族上,主动检索达到**零误差** |
+| **C.7** | 被动检索有 **irreducible error**(不可消解误差),除非预算指数级增长 |
+
+**这是一个数学定理,不是经验观察**。它证明了:对于某类记忆访问任务,Mem0/Zep 那种"先 embedding 召回再让 LLM 推理"的被动范式**理论上做不到零误差**,而 MRAgent 这种"LLM 推理嵌入检索"的主动范式可以。
+
+### 经验证实理论
+
+在 LoCoMo 和 LongMemEval 上(就是 [10](10-memory-frameworks.md) §3 用的同一个 benchmark),MRAgent:
+- 比 baseline 高 **23%**
+- 同时**降低** token 和 runtime 成本
+
+**这是对 [13](13-reconstructive-memory.md) §2 的强支持**:重构式不只是"更接近人脑"的哲学论点,它在 benchmark 上**精度更高、成本更低**,而且有数学解释为什么(主动 > 被动)。
+
+### 但它仍然没有进生产记忆公司
+
+MRAgent 是 ICML 2026 学术论文,代码开源于 github.com/Ji-shuo/MRAgent。但 **Mem0 / Zep / Letta / OpenViking / MemOS 没有一家采用它的方案** —— 它们仍然是被动检索式。这和 [11](11-causal-state-store.md) 因果状态库的处境一样:**学术有萌芽(而且是 ICML 级的萌芽),工业无人采用**。
+
+但 MRAgent 的存在让 [13](13-reconstructive-memory.md) 的论点从"哲学推测"升级为"有理论 + 有实验 + 有代码的开放方向"。本篇的论证方向被它**验证了**。
 
 ## 2.4 重构式记忆 vs 检索式记忆
 
@@ -265,7 +299,7 @@ Agent 永远知道自己**有哪些**过去(目录常驻),只是不知道**细�
 1. **重构式记忆的幻觉代价如何量化?** [papers/02](../papers/02-compaction-degradation.md) 测了检索式的退化,重构式的退化率没人测过。
 2. **校准机制哪个有效?** §2.5 列了三种,没有对比实验。
 3. **系统提示词目录何时膨胀到塞不下?** §1.4 提到这个硬伤,但没给具体的分页/聚类方案。
-4. **arXiv:2606.06036 那篇论文的具体效果如何?** 本篇引用了它,但没深入拆 —— 它是学术雏形,需要单独评估。
+4. **MRAgent 的具体方案如何评估?** §2.3 已介绍 —— ICML 2026 接收,有严格定理(主动 > 被动)和 +23% 实验。但需要单独评估它的 Cue-Tag-Content 图和 [11](11-causal-state-store.md) 因果图如何融合。
 5. **重构式和 [11](11-causal-state-store.md) 因果库叠加时的具体接口?** §3.2 说是正交可叠加,但没设计接口。
 
 这五个都是下一篇(或下一次实验)的天然选题。
