@@ -29,6 +29,11 @@
 - Bjlkeng (2024) · *Iterative Summarization using LLMs* · Blog · [link](https://bjlkeng.io/posts/iterative-summarization-using-llms/)
 - ByteDance Volcengine (2026) · *OpenViking: The Context Database for AI Agents* · GitHub · [link](https://github.com/volcengine/OpenViking)
 - Li, Z. et al. (2025) · *MemOS: A Memory OS for AI System* · arXiv:2507.03724 · [link](https://arxiv.org/abs/2507.03724)
+- Bartlett, F.C. (1932) · *Remembering: A Study in Experimental and Social Psychology* · Cambridge University Press
+- Schacter, D.L. & Addis, D.R. (2012) · *Constructive Memory: Past and Future* · Neuron 73(5) · PMC3341652 · [link](https://pmc.ncbi.nlm.nih.gov/articles/PMC3341652/)
+- Nader, K. et al. (2000) · *Fear memories require protein synthesis in the amygdala for reconsolidation* · Nature Neuroscience 1
+- Mau, W. et al. (2023) · *A generative model of memory construction and consolidation* · Nature Human Behaviour · [link](https://www.nature.com/articles/s41562-023-01799-z)
+- *Memory is Reconstructed, Not Retrieved: Graph Memory for LLM Agents* (2026) · arXiv:2606.06036 · [link](https://arxiv.org/abs/2606.06036)
 
 ### 官方文档 / 技术博客
 - Anthropic · *Building Effective Agents* · Anthropic Engineering Blog (Dec 2024) · [link](https://www.anthropic.com/engineering/building-effective-agents)
