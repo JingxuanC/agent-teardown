@@ -1,0 +1,16 @@
+[package]
+name = "grok-causal-memory"
+version = "0.1.0"
+edition = "2021"
+description = "Causal memory layer spike for grok-build — implements insights/11 §2 schema + retrieval"
+
+[dependencies]
+rusqlite = { version = "0.37", features = ["bundled"] }
+
+[lib]
+name = "grok_causal_memory"
+path = "src/lib.rs"
+
+[[bin]]
+name = "causal_vs_vector"
+path = "benches/causal_vs_vector.rs"
