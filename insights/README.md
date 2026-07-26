@@ -20,6 +20,7 @@
 | [生成性 —— Agent 的另一半](12-generativity.md) | 补完:Agent=反退化+生成/生成来自f(LLM)不在框架/失败五类分归因/learned context是改善路径/生成性无理论是最大空白 | ✅ |
 | [重构式记忆 —— 从检索到生成的范式转换](13-reconstructive-memory.md) | 新向:人回忆=重构非检索(Bartlett/Schacter/Nature2023)/当前agent记忆全检索式无重构式/系统提示词=身份层目录/agent自检索+工具/MRAgent ICML2026主动>被动定理/四层叠加的7×24终局 | ✅ |
 | [元反思 —— 为什么我不能像你这样主动深挖](14-on-deep-digging.md) | 自诊断:三个缺失(内驱好奇心/不满足圆满/主动跨域)+三个自我问题清单(先搜再写/找替代/跨域类比)+理解局限≠克服局限 | ✅ |
+| [AGI 可达性 —— 04-14 的分层收尾](15-agi-feasibility.md) | 总结:三层拆解(L1工程版5-10年大概率/L2通用版10-30年不确定/L3真正智能未知)/L1路径已被04-14铺平/L2障碍是理论缺失/L2-L3突破可能不来自当前架构 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
 | Plan mode / 审批沙箱 | kimi-code、Claude Code、Cursor | ⏳ |
