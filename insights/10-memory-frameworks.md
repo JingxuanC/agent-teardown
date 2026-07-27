@@ -166,14 +166,16 @@ viking://agent/coder-001/episodes/        # agent 的对话历史
 
 ## 3. LongMemEval 的硬数字:召回策略的精度差距
 
+> **⚠️ 更新(2026-07-27):本节的对比数据已过时。** Mem0 的 2026-07 新算法在 LongMemEval 达到 **93.4**(+25.6,其中 temporal +29.6、multi-hop +23.1),"Zep 比 Mem0 高 15 分"不再成立。详见 [papers/daily/2026-07-27-mem0-analysis.md](../papers/daily/2026-07-27-mem0-analysis.md)。下面的历史数据保留作对照。
+
 理论分析不够,看 benchmark。**LongMemEval**(arXiv:2410.10813)是这个赛道的 de facto 压力测试 —— 专门测"长对话里的事实召回",而且是**事实会随时间变化**的场景。
 
-用 GPT-4o 跑:
+用 GPT-4o 跑(2025 年数据,已被 2026-07 更新超越):
 
 | 记忆方案 | LongMemEval 分数 | Context Tokens | 中位延迟 |
 |---|---|---|---|
 | **Zep**(时序图谱) | **63.8%** | 1.6K | 2.58s |
-| **Mem0**(混合存储) | 49.0% | - | - |
+| **Mem0**(混合存储) | 49.0% → **93.4**(2026-07 新算法) | - | - |
 | Full-context(全塞) | 基准 | 115K | 28.9s |
 
 **三个结论:**
