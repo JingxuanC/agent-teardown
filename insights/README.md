@@ -22,6 +22,7 @@
 | [元反思 —— 为什么我不能像你这样主动深挖](14-on-deep-digging.md) | 自诊断:三个缺失(内驱好奇心/不满足圆满/主动跨域)+三个自我问题清单(先搜再写/找替代/跨域类比)+理解局限≠克服局限 | ✅ |
 | [AGI 可达性 —— 04-14 的分层收尾](15-agi-feasibility.md) | 总结:三层拆解(L1工程版5-10年大概率/L2通用版10-30年不确定/L3真正智能未知)/L1路径已被04-14铺平/L2障碍是理论缺失/L2-L3突破可能不来自当前架构 | ✅ |
 | [因果状态库的工程验证 —— 从概念到代码到真实 benchmark](16-spike-results.md) | 落地:11 的 schema 变成可编译 Rust 原型(6 测试过)+ 用 grok-build 真实生产 prompt 跑真实 LLM 压缩/k=2 拉开 15pp,k=5 拉开 55pp/发现三件 11 没预见的事(CHECK/互补/断崖) | ✅ |
+| [从因果层到完整记忆系统 —— One Graph, One Engine, One Loop](17-complete-memory-system.md) | 收口:因果层不是终点是滩头/统一命题:一切记忆都是 typed edge/兴奋抑制二元性(HeLa-Mem 兴奋侧+我们 prevented 抑制侧)/竞品全景矩阵/五条不可协商原则/17 天实施路线 | ✅ |
 | 子 agent 上下文隔离的三种方案 | kimi-code(scope)、Claude Code(worktree)、Cursor(?) | ⏳ |
 | Rate limit 退避的工程实践 | kimi-code、Anthropic SDK、OpenAI SDK | ⏳ |
 | Plan mode / 审批沙箱 | kimi-code、Claude Code、Cursor | ⏳ |
